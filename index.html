@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calvin Crepes - Professional Stock Ordering System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8B4513; /* SaddleBrown - warm crepe color */
+            --secondary: #D2691E; /* Chocolate */
+            --accent: #FFD700; /* Gold for highlights */
+            --light: #FFF8DC; /* Cornsilk */
+            --dark: #5D4037; /* Dark Brown */
+            --text: #333333;
+            --success: #4CAF50;
+            --danger: #e74c3c;
+            --info: #3498db;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f5f0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            color: var(--accent);
+        }
+        
+        .tagline {
+            font-style: italic;
+            opacity: 0.9;
+        }
+        
+        .order-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .info-group label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .info-group input, .info-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+        
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .category-btn {
+            background: var(--light);
+            border: 2px solid var(--primary);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--primary);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .stock-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .stock-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed var(--light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .search-box button {
+            background: var(--info);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stock-item {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #e0d6c8;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .stock-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+            flex: 1;
+        }
+        
+        .item-price {
+            font-weight: bold;
+            color: var(--primary);
+            background: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        
+        .gst-flag {
+            font-size: 0.8rem;
+            color: var(--success);
+            background: rgba(76, 175, 80, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+        
+        .order-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .qty-input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .qty-btn {
+            background: var(--light);
+            border: 1px solid #ddd;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .add-to-order {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .add-to-order:hover {
+            background: var(--secondary);
+        }
+        
+        .order-summary {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .order-summary.active {
+            display: block;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .summary-table th, .summary-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .summary-table th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .remove-btn {
+            color: var(--danger);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+        }
+        
+        .invoice-preview {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px dashed #ddd;
+        }
+        
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .invoice-table th, .invoice-table td {
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .invoice-table th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .invoice-summary {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-top: 2px dashed #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+            color: var(--primary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #2980b9;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .order-info {
+                flex-direction: column;
+            }
+            
+            .info-group input, .info-group select {
+                min-width: 100%;
+            }
+            
+            .categories {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .category-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .stock-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .invoice-details {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-pancakes"></i>
+                Calvin Crepes - Stock Ordering System
+                <i class="fas fa-pancakes"></i>
+            </div>
+            <p class="tagline">Order Supplies & Generate Invoices</p>
+        </header>
+        
+        <div class="order-info">
+            <div class="info-group">
+                <label for="order-date">Order Date</label>
+                <input type="date" id="order-date">
+            </div>
+            <div class="info-group">
+                <label for="prepared-by">Prepared By</label>
+                <input type="text" id="prepared-by" placeholder="Enter your name">
+            </div>
+            <div class="info-group">
+                <label for="location">Location</label>
+                <select id="location">
+                    <option value="liverpool">Calvin Crepes Liverpool</option>
+                    <option value="smithfield">Calvin Crepes Smithfield</option>
+                    <option value="st-mery">Calvin Crepes St Mery</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="categories">
+            <button class="category-btn active" data-category="chocolates">
+                <i class="fas fa-candy-cane"></i> Chocolates
+            </button>
+            <button class="category-btn" data-category="sauces">
+                <i class="fas fa-wine-bottle"></i> Sauces & Spreads
+            </button>
+            <button class="category-btn" data-category="crepes">
+                <i class="fas fa-bread-slice"></i> Crepe Items
+            </button>
+            <button class="category-btn" data-category="drinks">
+                <i class="fas fa-coffee"></i> Drinks & Beverages
+            </button>
+            <button class="category-btn" data-category="cakes">
+                <i class="fas fa-birthday-cake"></i> Cakes & Desserts
+            </button>
+            <button class="category-btn" data-category="crumbs">
+                <i class="fas fa-cookie-bite"></i> Toppings & Crumbs
+            </button>
+            <button class="category-btn" data-category="cleaning">
+                <i class="fas fa-pump-soap"></i> Cleaning Supplies
+            </button>
+            <button class="category-btn" data-category="packaging">
+                <i class="fas fa-box"></i> Packaging
+            </button>
+            <button class="category-btn" data-category="misc">
+                <i class="fas fa-ellipsis-h"></i> Miscellaneous
+            </button>
+        </div>
+        
+        <!-- Chocolates Section -->
+        <div class="stock-section active" id="chocolates-section">
+            <h2 class="section-title"><i class="fas fa-candy-cane"></i> Chocolates</h2>
+            <div class="search-box">
+                <input type="text" id="chocolates-search" placeholder="Search chocolates...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="chocolates-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Sauces & Spreads Section -->
+        <div class="stock-section" id="sauces-section">
+            <h2 class="section-title"><i class="fas fa-wine-bottle"></i> Sauces & Spreads</h2>
+            <div class="search-box">
+                <input type="text" id="sauces-search" placeholder="Search sauces...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="sauces-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Crepe Items Section -->
+        <div class="stock-section" id="crepes-section">
+            <h2 class="section-title"><i class="fas fa-bread-slice"></i> Crepe Items</h2>
+            <div class="search-box">
+                <input type="text" id="crepes-search" placeholder="Search crepe items...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="crepes-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Drinks & Beverages Section -->
+        <div class="stock-section" id="drinks-section">
+            <h2 class="section-title"><i class="fas fa-coffee"></i> Drinks & Beverages</h2>
+            <div class="search-box">
+                <input type="text" id="drinks-search" placeholder="Search drinks...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="drinks-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Cakes & Desserts Section -->
+        <div class="stock-section" id="cakes-section">
+            <h2 class="section-title"><i class="fas fa-birthday-cake"></i> Cakes & Desserts</h2>
+            <div class="search-box">
+                <input type="text" id="cakes-search" placeholder="Search cakes...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="cakes-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Toppings & Crumbs Section -->
+        <div class="stock-section" id="crumbs-section">
+            <h2 class="section-title"><i class="fas fa-cookie-bite"></i> Toppings & Crumbs</h2>
+            <div class="search-box">
+                <input type="text" id="crumbs-search" placeholder="Search toppings...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="crumbs-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Cleaning Supplies Section -->
+        <div class="stock-section" id="cleaning-section">
+            <h2 class="section-title"><i class="fas fa-pump-soap"></i> Cleaning Supplies</h2>
+            <div class="search-box">
+                <input type="text" id="cleaning-search" placeholder="Search cleaning items...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="cleaning-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Packaging Section -->
+        <div class="stock-section" id="packaging-section">
+            <h2 class="section-title"><i class="fas fa-box"></i> Packaging</h2>
+            <div class="search-box">
+                <input type="text" id="packaging-search" placeholder="Search packaging...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="packaging-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Miscellaneous Section -->
+        <div class="stock-section" id="misc-section">
+            <h2 class="section-title"><i class="fas fa-ellipsis-h"></i> Miscellaneous</h2>
+            <div class="search-box">
+                <input type="text" id="misc-search" placeholder="Search misc items...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="misc-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="order-summary" id="order-summary">
+            <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Order Summary</h2>
+            
+            <div class="invoice-preview">
+                <div class="invoice-header">
+                    <h3>Calvin Crepes - Stock Order Invoice</h3>
+                    <p id="invoice-location">Calvin Crepes Liverpool</p>
+                    <p id="invoice-date">Date: Loading...</p>
+                    <p id="invoice-number">Order #: CR-<span id="invoice-id">0001</span></p>
+                </div>
+                
+                <div class="invoice-details">
+                    <div>
+                        <h4>Order Details:</h4>
+                        <p id="customer-name">Prepared by: </p>
+                        <p id="customer-contact">Location: </p>
+                    </div>
+                    <div>
+                        <h4>Business Details:</h4>
+                        <p>Calvin Crepes</p>
+                        <p id="business-address">123 Crepe Street, Liverpool L1 1AB</p>
+                        <p>ABN: 12 345 678 901</p>
+                    </div>
+                </div>
+                
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Unit Price (AUD)</th>
+                            <th>GST</th>
+                            <th>Total (AUD)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summary-items">
+                        <!-- Order summary items will be added here -->
+                    </tbody>
+                </table>
+                
+                <div class="invoice-summary">
+                    <div class="summary-row">
+                        <span>Subtotal (excl. GST):</span>
+                        <span id="subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>GST (10%):</span>
+                        <span id="gst">$0.00</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total (incl. GST):</span>
+                        <span id="total">$0.00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-info" id="print-order-btn">
+                    <i class="fas fa-print"></i> Print Invoice
+                </button>
+                <button class="btn btn-success" id="whatsapp-btn">
+                    <i class="fab fa-whatsapp"></i> Send via WhatsApp
+                </button>
+                <button class="btn btn-primary" id="new-order-btn">
+                    <i class="fas fa-file"></i> New Order
+                </button>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="view-summary-btn">
+                <i class="fas fa-eye"></i> View Order Summary
+            </button>
+            <button class="btn btn-info" id="clear-order-btn">
+                <i class="fas fa-broom"></i> Clear All Orders
+            </button>
+        </div>
+        
+        <div class="notification" id="notification">
+            Item added to order successfully!
+        </div>
+    </div>
+    
+    <footer>
+        <p>Calvin Crepes &copy; 2023 | Professional Stock Ordering & Invoicing System</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Stock data extracted from the Excel file
+            const stockData = {
+                chocolates: [
+                    { name: "MILK CHOCOLATE VHP 10KG", price: 280, gstFlag: false },
+                    { name: "WHITE CALLET 28% 2X10KG BAG", price: 700, gstFlag: false }
+                ],
+                sauces: [
+                    { name: "Pistachio 5kgs", price: 105, gstFlag: false },
+                    { name: "Hazelnut 5kgs", price: 54.5, gstFlag: false },
+                    { name: "Nutella 3kg", price: 36.8, gstFlag: false },
+                    { name: "SYRUP MAPLE (PURE) 1LT QUEENS", price: 34, gstFlag: false },
+                    { name: "SYRUP MAPLE 4LT (PURE) CHEFS CHOICE", price: 88, gstFlag: false },
+                    { name: "PEANUT BUTTER CREAMY SMOOTH 1.8KG SKIPPY", price: 14, gstFlag: false },
+                    { name: "Biscoff pack of 4", price: 92, gstFlag: false },
+                    { name: "Bueno Sauce 5kgs", price: 48.5, gstFlag: false }
+                ],
+                crepes: [
+                    { name: "ICE CREAM VANILLA GOLD 10LT Everest", price: 21.5, gstFlag: true, gstAmount: 2.15 },
+                    { name: "WAFFLE BELGIAM Crtn", price: 36, gstFlag: true, gstAmount: 3.69 },
+                    { name: "Crepe Mix", price: 10, gstFlag: true, gstAmount: 2 },
+                    { name: "Pancakes 6 pieces", price: 6, gstFlag: false },
+                    { name: "DIXIES ICE CREAM CUPS VANILLA 72X100ML Everest", price: 33, gstFlag: true, gstAmount: 3.3 },
+                    { name: "DESSERT SAUCE CHOCOLATE FUDGE 500ml", price: 10.61, gstFlag: false },
+                    { name: "DESSERT SAUCE BELG CHOCOLATE 1LT", price: 20.25, gstFlag: false },
+                    { name: "OIL CANOLA SPRAY 450GM Gold N Canola", price: 4, gstFlag: false }
+                ],
+                drinks: [
+                    { name: "SYRUP CARAMEL 700ML Monin", price: 14.5, gstFlag: true, gstAmount: 1.45 },
+                    { name: "SYRUP PEACH TEA 700ML Monin", price: 14.95, gstFlag: true, gstAmount: 1.5 },
+                    { name: "SYRUP RASPBERRY 700ML Monin", price: 18.5, gstFlag: true, gstAmount: 1.85 },
+                    { name: "SYRUP STRAWBERRY 700ML Monin", price: 17, gstFlag: true, gstAmount: 1.7 },
+                    { name: "TOPPING CHOCOLATE 3LT Cottees", price: 12, gstFlag: false },
+                    { name: "Passionfruit Pulp 1kg", price: 7.9, gstFlag: false },
+                    { name: "COULIS MIX BERRY FROZEN 500GM SQUEEZE BOTTLE Sunnyside", price: 11.45, gstFlag: false },
+                    { name: "Caramel fudge sauce monin 1.89l", price: 25.4, gstFlag: true, gstAmount: 2.54 },
+                    { name: "SORBET PASSIONFRUIT 5LT Bravo", price: 30, gstFlag: false },
+                    { name: "Sorbet Lemon 5lt Bravo", price: 28.9, gstFlag: false },
+                    { name: "SORBET MANGO 5LT Bravo", price: 31, gstFlag: true, gstAmount: 3.1 },
+                    { name: "TOPPING BANANA 3LT G/F EDLYN", price: 11.5, gstFlag: false },
+                    { name: "NU PURE WATER 600ML X 24", price: 11.5, gstFlag: false },
+                    { name: "S.PELLEGRINO 250ML X 24", price: 31, gstFlag: true, gstAmount: 4 },
+                    { name: "V 250ML (CAN) X 24", price: 36, gstFlag: true, gstAmount: 4 },
+                    { name: "COKE 330ML (GLASS) X 24", price: 36, gstFlag: true, gstAmount: 3.6 },
+                    { name: "JUICE PINEAPPLE 2LT Eastcoast", price: 6.3, gstFlag: false },
+                    { name: "Lemon Mint 2L", price: 6.3, gstFlag: false },
+                    { name: "V 250ML (CAN - BLUE) X 24", price: 36, gstFlag: true, gstAmount: 4 }
+                ],
+                cakes: [
+                    { name: "New York Cheesecake", price: 59.6, gstFlag: true, gstAmount: 5.96 },
+                    { name: "CAKE BROWNIE SLAB 1.6KG Sara Lee", price: 24, gstFlag: true, gstAmount: 2.4 }
+                ],
+                crumbs: [
+                    { name: "PEANUTS GRANULATED 1KG Galaxy", price: 6.4, gstFlag: true, gstAmount: 0.64 },
+                    { name: "PISTACHIO NUT KERNAL 1KG Natures Secret", price: 39.95, gstFlag: false },
+                    { name: "MARSHMALLOW VANILLA 1KG PASCALL", price: 8.5, gstFlag: true, gstAmount: 0.85 },
+                    { name: "HAZELNUT MEAL 1KG Natures Secret", price: 18, gstFlag: false },
+                    { name: "OREO SMALL CRUSHED COOKIES PIECES 454GM Oreo", price: 100.8, gstFlag: true, gstAmount: 10.08 },
+                    { name: "CHOCOLATE GARNISH FLAKE DAIRY MILK 5KG CADBURY", price: 144, gstFlag: true, gstAmount: 14.48 },
+                    { name: "BULK-CHOCOLATE MINI M&MS 1 KG", price: 2.22, gstFlag: true, gstAmount: 2.1 }
+                ],
+                cleaning: [
+                    { name: "WIPES GREEN ROLL H/D Pak", price: 87, gstFlag: true, gstAmount: 8.7 },
+                    { name: "DISHWASHING LIQUID 5LT Global", price: 10.9, gstFlag: false },
+                    { name: "MOP HEAD 450GM SIZE 24", price: 9.9, gstFlag: true, gstAmount: 0.99 },
+                    { name: "PAPER TOWEL INTERLEAF SLIM FOLD 23X8CM 4000'S Pure Washroom", price: 45, gstFlag: true, gstAmount: 4.5 },
+                    { name: "Alsco Tea Towel", price: 0.8, gstFlag: true, gstAmount: 0 },
+                    { name: "All purpose cleaner 5lt Reliance Chemicals", price: 18.09, gstFlag: true, gstAmount: 1.8 },
+                    { name: "FLOOR CLEANER 5LT Global", price: 13, gstFlag: true, gstAmount: 1.3 },
+                    { name: "GLOVES VINYL CLR POWDER FREE", price: 3.5, gstFlag: false },
+                    { name: "sponge", price: 2.5, gstFlag: false }
+                ],
+                packaging: [
+                    { name: "Dinner Brown Enviro Box (150 Per Carton)", price: 27, gstFlag: true, gstAmount: 2.7 },
+                    { name: "Medium Brown Flat Handle Carry Bag (200 Per Carton)", price: 48.5, gstFlag: true, gstAmount: 4.8 },
+                    { name: "100ml Sauce Containers (50 Per Sleeve | 20 Sleeves Per Carton)", price: 38, gstFlag: true, gstAmount: 3.8 },
+                    { name: "EL4 Sauce Lids to fit E2/E4 Sauce Containers (100 Per Sleeve | 10 Sleeves Per Carton)", price: 28, gstFlag: true, gstAmount: 2.8 },
+                    { name: "Large White Plastic bag", price: 33, gstFlag: true, gstAmount: 3.3 },
+                    { name: "22Oz Candy Stripe Milkshake Cups (500 Per Carton)", price: 92, gstFlag: true, gstAmount: 9.2 },
+                    { name: "Paper Straws Black", price: 78, gstFlag: true, gstAmount: 7.8 },
+                    { name: "D98 Dome Lids Honor ( 1000 Per Ctn )", price: 46.5, gstFlag: true, gstAmount: 4.65 },
+                    { name: "Wooden Spoons (100 Per Package) 20 in carton", price: 60, gstFlag: true, gstAmount: 6 },
+                    { name: "82Ltr Garbage Bags (250 Per Carton)", price: 34, gstFlag: true, gstAmount: 3.4 },
+                    { name: "BAMBOO SKEWERS 100PC 25CM 10INCH Pak Imports", price: 1.1, gstFlag: true, gstAmount: 0.11 },
+                    { name: "Disposable Forks", price: 36, gstFlag: true, gstAmount: 3.6 }
+                ],
+                misc: [
+                    { name: "GRANOLA GOURMET 1KG AMAZON POWER", price: 16, gstFlag: false },
+                    { name: "MANGO DICED FROZEN 1KG", price: 10.5, gstFlag: false },
+                    { name: "GLOVES BLACK NITRILE (LARGE) POWDER", price: 6.5, gstFlag: true, gstAmount: 0.6 },
+                    { name: "Box of Thermal Rolls (80x80)", price: 88, gstFlag: false },
+                    { name: "Whipped Cream 500ml", price: 7.9, gstFlag: false }
+                ]
+            };
+            
+            // Location data with addresses
+            const locations = {
+                liverpool: {
+                    name: "Calvin Crepes Liverpool",
+                    address: "123 Crepe Street, Liverpool L1 1AB"
+                },
+                smithfield: {
+                    name: "Calvin Crepes Smithfield",
+                    address: "456 Market Lane, Smithfield EC1A 9PT"
+                },
+                "st-mery": {
+                    name: "Calvin Crepes St Mery",
+                    address: "789 Riverside Walk, St Mery SE1 2AB"
+                }
+            };
+            
+            // DOM Elements
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            const stockSections = document.querySelectorAll('.stock-section');
+            const orderSummary = document.getElementById('order-summary');
+            const viewSummaryBtn = document.getElementById('view-summary-btn');
+            const clearOrderBtn = document.getElementById('clear-order-btn');
+            const printOrderBtn = document.getElementById('print-order-btn');
+            const whatsappBtn = document.getElementById('whatsapp-btn');
+            const newOrderBtn = document.getElementById('new-order-btn');
+            const notification = document.getElementById('notification');
+            const orderDate = document.getElementById('order-date');
+            const preparedBy = document.getElementById('prepared-by');
+            const locationSelect = document.getElementById('location');
+            const invoiceLocation = document.getElementById('invoice-location');
+            const businessAddress = document.getElementById('business-address');
+            const invoiceDate = document.getElementById('invoice-date');
+            const invoiceId = document.getElementById('invoice-id');
+            const customerName = document.getElementById('customer-name');
+            const customerContact = document.getElementById('customer-contact');
+            
+            // Set current date
+            const today = new Date();
+            orderDate.value = today.toISOString().split('T')[0];
+            invoiceDate.textContent = `Date: ${today.toLocaleDateString('en-AU', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            })}`;
+            
+            // Order data
+            let orderItems = [];
+            let invoiceCounter = 1001;
+            
+            // Initialize stock tables
+            initializeStockItems();
+            
+            // Category navigation
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    
+                    // Update active button
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    stockSections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === `${category}-section`) {
+                            section.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Location change
+            locationSelect.addEventListener('change', function() {
+                updateInvoiceLocation();
+            });
+            
+            // Prepared by change
+            preparedBy.addEventListener('input', function() {
+                updateInvoiceDetails();
+            });
+            
+            // View order summary
+            viewSummaryBtn.addEventListener('click', function() {
+                if (orderItems.length === 0) {
+                    showNotification('No items in the order yet. Add items to create an order.');
+                    return;
+                }
+                
+                updateOrderSummary();
+                orderSummary.classList.add('active');
+                
+                // Scroll to summary
+                orderSummary.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Clear all orders
+            clearOrderBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all items from the order?')) {
+                    orderItems = [];
+                    resetAllQuantityInputs();
+                    orderSummary.classList.remove('active');
+                    showNotification('All items removed from order');
+                }
+            });
+            
+            // Print order
+            printOrderBtn.addEventListener('click', function() {
+                window.print();
+            });
+            
+            // WhatsApp sharing
+            whatsappBtn.addEventListener('click', function() {
+                if (orderItems.length === 0) {
+                    showNotification('No items to send. Please add items to the order first.');
+                    return;
+                }
+                
+                if (!preparedBy.value.trim()) {
+                    showNotification('Please enter your name in the "Prepared By" field.');
+                    preparedBy.focus();
+                    return;
+                }
+                
+                sendWhatsAppInvoice();
+            });
+            
+            // New order
+            newOrderBtn.addEventListener('click', function() {
+                if (confirm('Start a new order? Current order will be cleared.')) {
+                    orderItems = [];
+                    resetAllQuantityInputs();
+                    orderSummary.classList.remove('active');
+                    preparedBy.value = '';
+                    invoiceCounter++;
+                    invoiceId.textContent = invoiceCounter.toString().padStart(4, '0');
+                    showNotification('New order started');
+                }
+            });
+            
+            // Initialize stock items with quantity controls
+            function initializeStockItems() {
+                for (const category in stockData) {
+                    const grid = document.getElementById(`${category}-items`);
+                    grid.innerHTML = '';
+                    
+                    stockData[category].forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'stock-item';
+                        
+                        const gstFlag = item.gstFlag ? `<span class="gst-flag">GST</span>` : '';
+                        
+                        itemElement.innerHTML = `
+                            <div class="item-header">
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-price">$${item.price.toFixed(2)}${gstFlag}</div>
+                            </div>
+                            <div class="order-controls">
+                                <div class="qty-control">
+                                    <button class="qty-btn minus">-</button>
+                                    <input type="number" class="qty-input" value="0" min="0" data-item="${item.name}" data-price="${item.price}" data-gst="${item.gstFlag}" data-category="${category}">
+                                    <button class="qty-btn plus">+</button>
+                                </div>
+                                <button class="add-to-order">Add to Order</button>
+                            </div>
+                        `;
+                        
+                        grid.appendChild(itemElement);
+                    });
+                }
+                
+                // Add event listeners to quantity controls
+                addQuantityEventListeners();
+                
+                // Update invoice location
+                updateInvoiceLocation();
+            }
+            
+            // Add event listeners to quantity controls
+            function addQuantityEventListeners() {
+                document.querySelectorAll('.qty-btn.plus').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const input = this.parentElement.querySelector('.qty-input');
+                        input.value = parseInt(input.value) + 1;
+                    });
+                });
+                
+                document.querySelectorAll('.qty-btn.minus').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const input = this.parentElement.querySelector('.qty-input');
+                        if (parseInt(input.value) > 0) {
+                            input.value = parseInt(input.value) - 1;
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.qty-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        if (parseInt(this.value) < 0) this.value = 0;
+                    });
+                });
+                
+                document.querySelectorAll('.add-to-order').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const input = this.parentElement.querySelector('.qty-input');
+                        const quantity = parseInt(input.value);
+                        
+                        if (quantity > 0) {
+                            const itemName = input.getAttribute('data-item');
+                            const itemPrice = parseFloat(input.getAttribute('data-price'));
+                            const gstFlag = input.getAttribute('data-gst') === 'true';
+                            const category = input.getAttribute('data-category');
+                            
+                            addItemToOrder(itemName, itemPrice, gstFlag, category, quantity);
+                            input.value = 0;
+                        } else {
+                            showNotification('Please set a quantity greater than 0');
+                        }
+                    });
+                });
+            }
+            
+            // Add item to order
+            function addItemToOrder(name, price, gstFlag, category, quantity) {
+                // Find if item already exists in order
+                const existingIndex = orderItems.findIndex(item => item.name === name);
+                
+                if (existingIndex !== -1) {
+                    // Update quantity
+                    orderItems[existingIndex].quantity += quantity;
+                } else {
+                    // Add new item
+                    orderItems.push({
+                        name: name,
+                        price: price,
+                        gstFlag: gstFlag,
+                        category: category,
+                        quantity: quantity
+                    });
+                }
+                
+                showNotification(`${quantity} x ${name} added to order`);
+            }
+            
+            // Update order summary display
+            function updateOrderSummary() {
+                const summaryBody = document.getElementById('summary-items');
+                summaryBody.innerHTML = '';
+                
+                let subtotal = 0;
+                let gstTotal = 0;
+                
+                orderItems.forEach((item, index) => {
+                    const itemTotal = item.price * item.quantity;
+                    const itemGST = item.gstFlag ? itemTotal * 0.1 : 0;
+                    
+                    subtotal += itemTotal;
+                    gstTotal += itemGST;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>$${item.price.toFixed(2)}</td>
+                        <td>${item.gstFlag ? 'Yes' : 'No'}</td>
+                        <td>$${itemTotal.toFixed(2)}</td>
+                        <td><button class="remove-btn" data-index="${index}"><i class="fas fa-trash"></i></button></td>
+                    `;
+                    
+                    summaryBody.appendChild(row);
+                });
+                
+                // Calculate total
+                const total = subtotal + gstTotal;
+                
+                // Update summary
+                document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+                document.getElementById('gst').textContent = `$${gstTotal.toFixed(2)}`;
+                document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        const itemName = orderItems[index].name;
+                        
+                        // Remove from order
+                        orderItems.splice(index, 1);
+                        
+                        // Update summary
+                        updateOrderSummary();
+                        
+                        showNotification(`${itemName} removed from order`);
+                        
+                        // Hide summary if no items left
+                        if (orderItems.length === 0) {
+                            orderSummary.classList.remove('active');
+                        }
+                    });
+                });
+                
+                // Update invoice details
+                updateInvoiceDetails();
+            }
+            
+            // Reset all quantity inputs to 0
+            function resetAllQuantityInputs() {
+                document.querySelectorAll('.qty-input').forEach(input => {
+                    input.value = 0;
+                });
+            }
+            
+            // Update invoice location based on selection
+            function updateInvoiceLocation() {
+                const locationKey = locationSelect.value;
+                const location = locations[locationKey];
+                
+                invoiceLocation.textContent = location.name;
+                businessAddress.textContent = location.address;
+                
+                updateInvoiceDetails();
+            }
+            
+            // Update invoice details
+            function updateInvoiceDetails() {
+                customerName.textContent = `Prepared by: ${preparedBy.value || 'Not specified'}`;
+                customerContact.textContent = `Location: ${invoiceLocation.textContent}`;
+            }
+            
+            // Send invoice via WhatsApp
+            function sendWhatsAppInvoice() {
+                const locationKey = locationSelect.value;
+                const location = locations[locationKey];
+                
+                let message = `*Calvin Crepes - Stock Order Invoice*%0A%0A`;
+                message += `*Order #:* CR-${invoiceId.textContent}%0A`;
+                message += `*Date:* ${today.toLocaleDateString('en-AU')}%0A`;
+                message += `*Location:* ${location.name}%0A`;
+                message += `*Prepared by:* ${preparedBy.value}%0A%0A`;
+                message += `*Order Items:*%0A`;
+                
+                let subtotal = 0;
+                let gstTotal = 0;
+                
+                orderItems.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    const itemGST = item.gstFlag ? itemTotal * 0.1 : 0;
+                    
+                    subtotal += itemTotal;
+                    gstTotal += itemGST;
+                    
+                    message += `- ${item.quantity}x ${item.name}: $${itemTotal.toFixed(2)}${item.gstFlag ? ' (GST)' : ''}%0A`;
+                });
+                
+                const total = subtotal + gstTotal;
+                
+                message += `%0A*Subtotal (excl. GST):* $${subtotal.toFixed(2)}%0A`;
+                message += `*GST (10%):* $${gstTotal.toFixed(2)}%0A`;
+                message += `*Total (incl. GST):* $${total.toFixed(2)}%0A%0A`;
+                message += `*Thank you for your order!*`;
+                
+                const whatsappUrl = `https://wa.me/?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+                
+                showNotification('WhatsApp invoice generated!');
+            }
+            
+            // Show notification
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.style.display = 'block';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
