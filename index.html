@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calvin Crepes - Professional Stock Ordering System</title>
+    <title>Calvin's HQ - Professional Stock Ordering System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -483,7 +483,7 @@
         <header>
             <div class="logo">
                 <i class="fas fa-pancakes"></i>
-                Calvin Crepes - Stock Ordering System
+                Calvin's HQ - Stock Ordering System
                 <i class="fas fa-pancakes"></i>
             </div>
             <p class="tagline">Order Supplies & Generate Invoices</p>
@@ -501,9 +501,11 @@
             <div class="info-group">
                 <label for="location">Location</label>
                 <select id="location">
-                    <option value="liverpool">Calvin Crepes Liverpool</option>
-                    <option value="smithfield">Calvin Crepes Smithfield</option>
-                    <option value="st-mery">Calvin Crepes St Mery</option>
+                    <option value="liverpool">Calvin's HQ Liverpool</option>
+                    <option value="smithfield">Calvin's HQ Smithfield</option>
+                    <option value="st-mery">Calvin's HQ St Mery</option>
+                    <option value="miranda">Calvin's HQ Miranda</option>
+                    <option value="hurstville">Calvin's HQ Hurstville</option>
                 </select>
             </div>
         </div>
@@ -511,6 +513,9 @@
         <div class="categories">
             <button class="category-btn active" data-category="chocolates">
                 <i class="fas fa-candy-cane"></i> Chocolates
+            </button>
+            <button class="category-btn" data-category="fruit">
+                <i class="fas fa-apple-alt"></i> Fruits
             </button>
             <button class="category-btn" data-category="sauces">
                 <i class="fas fa-wine-bottle"></i> Sauces & Spreads
@@ -546,6 +551,18 @@
                 <button><i class="fas fa-search"></i> Search</button>
             </div>
             <div class="stock-grid" id="chocolates-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Fruits Section -->
+        <div class="stock-section" id="fruit-section">
+            <h2 class="section-title"><i class="fas fa-apple-alt"></i> Fruits</h2>
+            <div class="search-box">
+                <input type="text" id="fruit-search" placeholder="Search fruits...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="fruit-items">
                 <!-- Items will be populated by JavaScript -->
             </div>
         </div>
@@ -651,8 +668,8 @@
             
             <div class="invoice-preview">
                 <div class="invoice-header">
-                    <h3>Calvin Crepes - Stock Order Invoice</h3>
-                    <p id="invoice-location">Calvin Crepes Liverpool</p>
+                    <h3>Calvin's HQ - Stock Order Invoice</h3>
+                    <p id="invoice-location">Calvin's HQ Liverpool</p>
                     <p id="invoice-date">Date: Loading...</p>
                     <p id="invoice-number">Order #: CR-<span id="invoice-id">0001</span></p>
                 </div>
@@ -665,7 +682,7 @@
                     </div>
                     <div>
                         <h4>Business Details:</h4>
-                        <p>Calvin Crepes</p>
+                        <p>Calvin's HQ</p>
                         <p id="business-address">123 Crepe Street, Liverpool L1 1AB</p>
                         <p>ABN: 12 345 678 901</p>
                     </div>
@@ -677,7 +694,7 @@
                             <th>Item</th>
                             <th>Quantity</th>
                             <th>Unit Price (AUD)</th>
-                            <th>GST</th>
+                            <th>GST Amount</th>
                             <th>Total (AUD)</th>
                             <th>Action</th>
                         </tr>
@@ -693,7 +710,7 @@
                         <span id="subtotal">$0.00</span>
                     </div>
                     <div class="summary-row">
-                        <span>GST (10%):</span>
+                        <span>Total GST:</span>
                         <span id="gst">$0.00</span>
                     </div>
                     <div class="summary-row total-row">
@@ -731,7 +748,7 @@
     </div>
     
     <footer>
-        <p>Calvin Crepes &copy; 2023 | Professional Stock Ordering & Invoicing System</p>
+        <p>Calvin's HQ &copy; 2023 | Professional Stock Ordering & Invoicing System</p>
     </footer>
 
     <script>
@@ -739,73 +756,88 @@
             // Stock data extracted from the Excel file
             const stockData = {
                 chocolates: [
-                    { name: "MILK CHOCOLATE VHP 10KG", price: 280, gstFlag: false },
-                    { name: "WHITE CALLET 28% 2X10KG BAG", price: 700, gstFlag: false }
+                    { name: "MILK CHOCOLATE VHP 10KG", price: 280, gstFlag: false, gstAmount: 0 },
+                    { name: "WHITE CALLET 28% 10KG BAG", price: 330, gstFlag: false, gstAmount: 0 },
+                    { name: "Box of bueno", price: 38, gstFlag: false, gstAmount: 0 },
+                    { name: "Kitkat block", price: 5, gstFlag: false, gstAmount: 0 },
+                    { name: "Caramilk block", price: 7, gstFlag: false, gstAmount: 0 },
+                    { name: "Mars Bar 20", price: 12.5, gstFlag: false, gstAmount: 0 },
+                    { name: "Ferrero 10 pieces", price: 18, gstFlag: false, gstAmount: 0 },
+                    { name: "Snickers Bar 10 pieces", price: 12.5, gstFlag: false, gstAmount: 0 }
+                ],
+                fruit: [
+                    { name: "Strawberry", price: 0, gstFlag: false, gstAmount: 0 },
+                    { name: "Kiwi 5", price: 5, gstFlag: false, gstAmount: 0 },
+                    { name: "Box of Banana", price: 0, gstFlag: false, gstAmount: 0 },
+                    { name: "Mint", price: 2, gstFlag: false, gstAmount: 0 },
+                    { name: "Blueberries", price: 3, gstFlag: false, gstAmount: 0 }
                 ],
                 sauces: [
-                    { name: "Pistachio 5kgs", price: 105, gstFlag: false },
-                    { name: "Hazelnut 5kgs", price: 54.5, gstFlag: false },
-                    { name: "Nutella 3kg", price: 36.8, gstFlag: false },
-                    { name: "SYRUP MAPLE (PURE) 1LT QUEENS", price: 34, gstFlag: false },
-                    { name: "SYRUP MAPLE 4LT (PURE) CHEFS CHOICE", price: 88, gstFlag: false },
-                    { name: "PEANUT BUTTER CREAMY SMOOTH 1.8KG SKIPPY", price: 14, gstFlag: false },
-                    { name: "Biscoff pack of 4", price: 92, gstFlag: false },
-                    { name: "Bueno Sauce 5kgs", price: 48.5, gstFlag: false }
+                    { name: "Pistachio 5kgs", price: 105, gstFlag: false, gstAmount: 0 },
+                    { name: "Hazelnut 5kgs", price: 54.5, gstFlag: false, gstAmount: 0 },
+                    { name: "Nutella 3kg x2", price: 73, gstFlag: false, gstAmount: 0 },
+                    { name: "SYRUP MAPLE (PURE) 1LT QUEENS", price: 34, gstFlag: false, gstAmount: 0 },
+                    { name: "SYRUP MAPLE 4LT (PURE) CHEFS CHOICE", price: 88, gstFlag: false, gstAmount: 0 },
+                    { name: "PEANUT BUTTER CREAMY SMOOTH 1.8KG SKIPPY", price: 14, gstFlag: false, gstAmount: 0 },
+                    { name: "Biscoff pack of 4", price: 92, gstFlag: false, gstAmount: 0 },
+                    { name: "Bueno Sauce 5kgs", price: 48.5, gstFlag: false, gstAmount: 0 }
                 ],
                 crepes: [
                     { name: "ICE CREAM VANILLA GOLD 10LT Everest", price: 21.5, gstFlag: true, gstAmount: 2.15 },
                     { name: "WAFFLE BELGIAM Crtn", price: 36, gstFlag: true, gstAmount: 3.69 },
                     { name: "Crepe Mix", price: 10, gstFlag: true, gstAmount: 2 },
-                    { name: "Pancakes 6 pieces", price: 6, gstFlag: false },
+                    { name: "Pancakes 10 pieces", price: 20, gstFlag: false, gstAmount: 0 },
                     { name: "DIXIES ICE CREAM CUPS VANILLA 72X100ML Everest", price: 33, gstFlag: true, gstAmount: 3.3 },
-                    { name: "DESSERT SAUCE CHOCOLATE FUDGE 500ml", price: 10.61, gstFlag: false },
-                    { name: "DESSERT SAUCE BELG CHOCOLATE 1LT", price: 20.25, gstFlag: false },
-                    { name: "OIL CANOLA SPRAY 450GM Gold N Canola", price: 4, gstFlag: false }
+                    { name: "DESSERT SAUCE CHOCOLATE FUDGE 500ml", price: 10.61, gstFlag: false, gstAmount: 0 },
+                    { name: "DESSERT SAUCE BELG CHOCOLATE 1LT", price: 20.25, gstFlag: false, gstAmount: 0 },
+                    { name: "OIL CANOLA SPRAY 450GM Gold N Canola", price: 4, gstFlag: false, gstAmount: 0 }
                 ],
                 drinks: [
                     { name: "SYRUP CARAMEL 700ML Monin", price: 14.5, gstFlag: true, gstAmount: 1.45 },
                     { name: "SYRUP PEACH TEA 700ML Monin", price: 14.95, gstFlag: true, gstAmount: 1.5 },
                     { name: "SYRUP RASPBERRY 700ML Monin", price: 18.5, gstFlag: true, gstAmount: 1.85 },
                     { name: "SYRUP STRAWBERRY 700ML Monin", price: 17, gstFlag: true, gstAmount: 1.7 },
-                    { name: "TOPPING CHOCOLATE 3LT Cottees", price: 12, gstFlag: false },
-                    { name: "Passionfruit Pulp 1kg", price: 7.9, gstFlag: false },
-                    { name: "COULIS MIX BERRY FROZEN 500GM SQUEEZE BOTTLE Sunnyside", price: 11.45, gstFlag: false },
+                    { name: "TOPPING CHOCOLATE 3LT Cottees", price: 12, gstFlag: false, gstAmount: 0 },
+                    { name: "Choc powder for frappe", price: 12.9, gstFlag: false, gstAmount: 0 },
+                    { name: "Passionfruit Pulp 1kg", price: 7.9, gstFlag: false, gstAmount: 0 },
+                    { name: "COULIS MIX BERRY FROZEN 500GM SQUEEZE BOTTLE Sunnyside", price: 11.45, gstFlag: false, gstAmount: 0 },
                     { name: "Caramel fudge sauce monin 1.89l", price: 25.4, gstFlag: true, gstAmount: 2.54 },
-                    { name: "SORBET PASSIONFRUIT 5LT Bravo", price: 30, gstFlag: false },
-                    { name: "Sorbet Lemon 5lt Bravo", price: 28.9, gstFlag: false },
+                    { name: "SORBET PASSIONFRUIT 5LT Bravo", price: 30, gstFlag: false, gstAmount: 0 },
+                    { name: "Sorbet Lemon 5lt Bravo", price: 28.9, gstFlag: false, gstAmount: 0 },
                     { name: "SORBET MANGO 5LT Bravo", price: 31, gstFlag: true, gstAmount: 3.1 },
-                    { name: "TOPPING BANANA 3LT G/F EDLYN", price: 11.5, gstFlag: false },
-                    { name: "NU PURE WATER 600ML X 24", price: 11.5, gstFlag: false },
+                    { name: "TOPPING BANANA 3LT G/F EDLYN", price: 11.5, gstFlag: false, gstAmount: 0 },
+                    { name: "NU PURE WATER 600ML X 24", price: 11.5, gstFlag: false, gstAmount: 0 },
                     { name: "S.PELLEGRINO 250ML X 24", price: 31, gstFlag: true, gstAmount: 4 },
                     { name: "V 250ML (CAN) X 24", price: 36, gstFlag: true, gstAmount: 4 },
                     { name: "COKE 330ML (GLASS) X 24", price: 36, gstFlag: true, gstAmount: 3.6 },
-                    { name: "JUICE PINEAPPLE 2LT Eastcoast", price: 6.3, gstFlag: false },
-                    { name: "Lemon Mint 2L", price: 6.3, gstFlag: false },
+                    { name: "JUICE PINEAPPLE 2LT Eastcoast", price: 6.3, gstFlag: false, gstAmount: 0 },
+                    { name: "Lemon Mint 2L", price: 6.3, gstFlag: false, gstAmount: 0 },
                     { name: "V 250ML (CAN - BLUE) X 24", price: 36, gstFlag: true, gstAmount: 4 }
                 ],
                 cakes: [
-                    { name: "New York Cheesecake", price: 59.6, gstFlag: true, gstAmount: 5.96 },
+                    { name: "1/2 Cheesecake", price: 30, gstFlag: true, gstAmount: 5.96 },
                     { name: "CAKE BROWNIE SLAB 1.6KG Sara Lee", price: 24, gstFlag: true, gstAmount: 2.4 }
                 ],
                 crumbs: [
                     { name: "PEANUTS GRANULATED 1KG Galaxy", price: 6.4, gstFlag: true, gstAmount: 0.64 },
-                    { name: "PISTACHIO NUT KERNAL 1KG Natures Secret", price: 39.95, gstFlag: false },
+                    { name: "PISTACHIO NUT KERNAL 1KG Natures Secret", price: 39.95, gstFlag: false, gstAmount: 0 },
                     { name: "MARSHMALLOW VANILLA 1KG PASCALL", price: 8.5, gstFlag: true, gstAmount: 0.85 },
-                    { name: "HAZELNUT MEAL 1KG Natures Secret", price: 18, gstFlag: false },
-                    { name: "OREO SMALL CRUSHED COOKIES PIECES 454GM Oreo", price: 100.8, gstFlag: true, gstAmount: 10.08 },
+                    { name: "HAZELNUT MEAL 1KG Natures Secret", price: 18, gstFlag: false, gstAmount: 0 },
+                    { name: "OREO SMALL CRUSHED COOKIES PIECES 454GM Oreo", price: 4.5, gstFlag: true, gstAmount: 0.5 },
                     { name: "CHOCOLATE GARNISH FLAKE DAIRY MILK 5KG CADBURY", price: 144, gstFlag: true, gstAmount: 14.48 },
-                    { name: "BULK-CHOCOLATE MINI M&MS 1 KG", price: 2.22, gstFlag: true, gstAmount: 2.1 }
+                    { name: "BULK-CHOCOLATE MINI M&MS 1 KG", price: 2.22, gstFlag: true, gstAmount: 2.1 },
+                    { name: "Biscoff crumbs", price: 5.9, gstFlag: false, gstAmount: 0 }
                 ],
                 cleaning: [
                     { name: "WIPES GREEN ROLL H/D Pak", price: 87, gstFlag: true, gstAmount: 8.7 },
-                    { name: "DISHWASHING LIQUID 5LT Global", price: 10.9, gstFlag: false },
+                    { name: "DISHWASHING LIQUID 5LT Global", price: 10.9, gstFlag: false, gstAmount: 0 },
                     { name: "MOP HEAD 450GM SIZE 24", price: 9.9, gstFlag: true, gstAmount: 0.99 },
                     { name: "PAPER TOWEL INTERLEAF SLIM FOLD 23X8CM 4000'S Pure Washroom", price: 45, gstFlag: true, gstAmount: 4.5 },
                     { name: "Alsco Tea Towel", price: 0.8, gstFlag: true, gstAmount: 0 },
                     { name: "All purpose cleaner 5lt Reliance Chemicals", price: 18.09, gstFlag: true, gstAmount: 1.8 },
                     { name: "FLOOR CLEANER 5LT Global", price: 13, gstFlag: true, gstAmount: 1.3 },
-                    { name: "GLOVES VINYL CLR POWDER FREE", price: 3.5, gstFlag: false },
-                    { name: "sponge", price: 2.5, gstFlag: false }
+                    { name: "GLOVES VINYL CLR POWDER FREE", price: 3.5, gstFlag: false, gstAmount: 0 },
+                    { name: "sponge", price: 2.5, gstFlag: false, gstAmount: 0 }
                 ],
                 packaging: [
                     { name: "Dinner Brown Enviro Box (150 Per Carton)", price: 27, gstFlag: true, gstAmount: 2.7 },
@@ -819,30 +851,44 @@
                     { name: "Wooden Spoons (100 Per Package) 20 in carton", price: 60, gstFlag: true, gstAmount: 6 },
                     { name: "82Ltr Garbage Bags (250 Per Carton)", price: 34, gstFlag: true, gstAmount: 3.4 },
                     { name: "BAMBOO SKEWERS 100PC 25CM 10INCH Pak Imports", price: 1.1, gstFlag: true, gstAmount: 0.11 },
-                    { name: "Disposable Forks", price: 36, gstFlag: true, gstAmount: 3.6 }
+                    { name: "Disposable Forks", price: 36, gstFlag: true, gstAmount: 3.6 },
+                    { name: "Cling Wrap", price: 18.9, gstFlag: true, gstAmount: 1.89 },
+                    { name: "Cup trays", price: 8, gstFlag: true, gstAmount: 0.8 }
                 ],
                 misc: [
-                    { name: "GRANOLA GOURMET 1KG AMAZON POWER", price: 16, gstFlag: false },
-                    { name: "MANGO DICED FROZEN 1KG", price: 10.5, gstFlag: false },
+                    { name: "GRANOLA GOURMET 1KG AMAZON POWER", price: 16, gstFlag: false, gstAmount: 0 },
+                    { name: "MANGO DICED FROZEN 1KG", price: 10.5, gstFlag: false, gstAmount: 0 },
                     { name: "GLOVES BLACK NITRILE (LARGE) POWDER", price: 6.5, gstFlag: true, gstAmount: 0.6 },
-                    { name: "Box of Thermal Rolls (80x80)", price: 88, gstFlag: false },
-                    { name: "Whipped Cream 500ml", price: 7.9, gstFlag: false }
+                    { name: "Box of Thermal Rolls (80x80)", price: 88, gstFlag: false, gstAmount: 0 },
+                    { name: "Whipped Cream 500ml", price: 7.9, gstFlag: false, gstAmount: 0 },
+                    { name: "Icing Sugar", price: 1.9, gstFlag: false, gstAmount: 0 },
+                    { name: "Rice bubbles", price: 4, gstFlag: false, gstAmount: 0 },
+                    { name: "Katifi prep", price: 5, gstFlag: false, gstAmount: 0 },
+                    { name: "Coconut Flakes", price: 5.9, gstFlag: false, gstAmount: 0 }
                 ]
             };
             
             // Location data with addresses
             const locations = {
                 liverpool: {
-                    name: "Calvin Crepes Liverpool",
+                    name: "Calvin's  Liverpool",
                     address: "123 Crepe Street, Liverpool L1 1AB"
                 },
                 smithfield: {
-                    name: "Calvin Crepes Smithfield",
+                    name: "Calvin's  Smithfield",
                     address: "456 Market Lane, Smithfield EC1A 9PT"
                 },
                 "st-mery": {
-                    name: "Calvin Crepes St Mery",
+                    name: "Calvin's St Mery",
                     address: "789 Riverside Walk, St Mery SE1 2AB"
+                },
+                miranda: {
+                    name: "Calvin's  Miranda",
+                    address: "321 Westfield Drive, Miranda NSW 2228"
+                },
+                hurstville: {
+                    name: "Calvin's HQ Hurstville",
+                    address: "654 Forest Road, Hurstville NSW 2220"
                 }
             };
             
@@ -990,7 +1036,7 @@
                             <div class="order-controls">
                                 <div class="qty-control">
                                     <button class="qty-btn minus">-</button>
-                                    <input type="number" class="qty-input" value="0" min="0" data-item="${item.name}" data-price="${item.price}" data-gst="${item.gstFlag}" data-category="${category}">
+                                    <input type="number" class="qty-input" value="0" min="0" data-item="${item.name}" data-price="${item.price}" data-gst="${item.gstFlag}" data-gstamount="${item.gstAmount}" data-category="${category}">
                                     <button class="qty-btn plus">+</button>
                                 </div>
                                 <button class="add-to-order">Add to Order</button>
@@ -1041,9 +1087,10 @@
                             const itemName = input.getAttribute('data-item');
                             const itemPrice = parseFloat(input.getAttribute('data-price'));
                             const gstFlag = input.getAttribute('data-gst') === 'true';
+                            const gstAmount = parseFloat(input.getAttribute('data-gstamount'));
                             const category = input.getAttribute('data-category');
                             
-                            addItemToOrder(itemName, itemPrice, gstFlag, category, quantity);
+                            addItemToOrder(itemName, itemPrice, gstFlag, gstAmount, category, quantity);
                             input.value = 0;
                         } else {
                             showNotification('Please set a quantity greater than 0');
@@ -1053,7 +1100,7 @@
             }
             
             // Add item to order
-            function addItemToOrder(name, price, gstFlag, category, quantity) {
+            function addItemToOrder(name, price, gstFlag, gstAmount, category, quantity) {
                 // Find if item already exists in order
                 const existingIndex = orderItems.findIndex(item => item.name === name);
                 
@@ -1066,6 +1113,7 @@
                         name: name,
                         price: price,
                         gstFlag: gstFlag,
+                        gstAmount: gstAmount,
                         category: category,
                         quantity: quantity
                     });
@@ -1084,7 +1132,7 @@
                 
                 orderItems.forEach((item, index) => {
                     const itemTotal = item.price * item.quantity;
-                    const itemGST = item.gstFlag ? itemTotal * 0.1 : 0;
+                    const itemGST = item.gstFlag ? item.gstAmount * item.quantity : 0;
                     
                     subtotal += itemTotal;
                     gstTotal += itemGST;
@@ -1094,7 +1142,7 @@
                         <td>${item.name}</td>
                         <td>${item.quantity}</td>
                         <td>$${item.price.toFixed(2)}</td>
-                        <td>${item.gstFlag ? 'Yes' : 'No'}</td>
+                        <td>${item.gstFlag ? `$${item.gstAmount.toFixed(2)} per unit` : 'No GST'}</td>
                         <td>$${itemTotal.toFixed(2)}</td>
                         <td><button class="remove-btn" data-index="${index}"><i class="fas fa-trash"></i></button></td>
                     `;
@@ -1164,7 +1212,7 @@
                 const locationKey = locationSelect.value;
                 const location = locations[locationKey];
                 
-                let message = `*Calvin Crepes - Stock Order Invoice*%0A%0A`;
+                let message = `*Calvin's HQ - Stock Order Invoice*%0A%0A`;
                 message += `*Order #:* CR-${invoiceId.textContent}%0A`;
                 message += `*Date:* ${today.toLocaleDateString('en-AU')}%0A`;
                 message += `*Location:* ${location.name}%0A`;
@@ -1176,18 +1224,18 @@
                 
                 orderItems.forEach(item => {
                     const itemTotal = item.price * item.quantity;
-                    const itemGST = item.gstFlag ? itemTotal * 0.1 : 0;
+                    const itemGST = item.gstFlag ? item.gstAmount * item.quantity : 0;
                     
                     subtotal += itemTotal;
                     gstTotal += itemGST;
                     
-                    message += `- ${item.quantity}x ${item.name}: $${itemTotal.toFixed(2)}${item.gstFlag ? ' (GST)' : ''}%0A`;
+                    message += `- ${item.quantity}x ${item.name}: $${itemTotal.toFixed(2)}${item.gstFlag ? ` (GST: $${itemGST.toFixed(2)})` : ''}%0A`;
                 });
                 
                 const total = subtotal + gstTotal;
                 
                 message += `%0A*Subtotal (excl. GST):* $${subtotal.toFixed(2)}%0A`;
-                message += `*GST (10%):* $${gstTotal.toFixed(2)}%0A`;
+                message += `*Total GST:* $${gstTotal.toFixed(2)}%0A`;
                 message += `*Total (incl. GST):* $${total.toFixed(2)}%0A%0A`;
                 message += `*Thank you for your order!*`;
                 
