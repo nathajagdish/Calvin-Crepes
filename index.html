@@ -16,6 +16,7 @@
             --success: #4CAF50;
             --danger: #e74c3c;
             --info: #3498db;
+            --warning: #f39c12;
         }
         
         * {
@@ -121,6 +122,16 @@
         
         .category-btn:hover, .category-btn.active {
             background: var(--primary);
+            color: white;
+        }
+        
+        .category-btn.missing-btn {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+        
+        .category-btn.missing-btn:hover, .category-btn.missing-btn.active {
+            background: var(--warning);
             color: white;
         }
         
@@ -275,6 +286,21 @@
             background: var(--secondary);
         }
         
+        .add-to-missing {
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .add-to-missing:hover {
+            background: #e67e22;
+        }
+        
         .order-summary {
             background: white;
             padding: 25px;
@@ -424,6 +450,15 @@
             background: #2980b9;
         }
         
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        
         .notification {
             position: fixed;
             top: 20px;
@@ -443,6 +478,111 @@
             padding: 20px;
             color: #777;
             font-size: 0.9rem;
+        }
+        
+        /* Missing Items Section */
+        .missing-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .missing-section.active {
+            display: block;
+        }
+        
+        .missing-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .missing-controls select,
+        .missing-controls input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .missing-controls select {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .missing-controls input {
+            width: 120px;
+        }
+        
+        .missing-controls button {
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .missing-list {
+            margin-top: 20px;
+        }
+        
+        .missing-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            background: #fff9e6;
+            margin-bottom: 8px;
+            border-radius: 5px;
+        }
+        
+        .missing-item-info {
+            flex: 1;
+        }
+        
+        .missing-item-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .missing-item-details {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 3px;
+        }
+        
+        .missing-item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .missing-item-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .missing-item-actions .edit-btn {
+            color: var(--info);
+        }
+        
+        .missing-item-actions .delete-btn {
+            color: var(--danger);
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-style: italic;
         }
         
         @media (max-width: 768px) {
@@ -475,6 +615,25 @@
             .invoice-details {
                 flex-direction: column;
             }
+            
+            .missing-controls {
+                flex-direction: column;
+            }
+            
+            .missing-controls select,
+            .missing-controls input {
+                width: 100%;
+            }
+            
+            .missing-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .missing-item-actions {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
@@ -483,10 +642,10 @@
         <header>
             <div class="logo">
                 <i class="fas fa-pancakes"></i>
-                Calvin's HQ - Stock Ordering System
+                Calvin's HQ - Professional Stock Ordering System
                 <i class="fas fa-pancakes"></i>
             </div>
-            <p class="tagline">Order Supplies & Generate Invoices</p>
+            <p class="tagline">Order Supplies, Track Missing Items & Generate Invoices</p>
         </header>
         
         <div class="order-info">
@@ -540,6 +699,9 @@
             </button>
             <button class="category-btn" data-category="misc">
                 <i class="fas fa-ellipsis-h"></i> Miscellaneous
+            </button>
+            <button class="category-btn missing-btn" data-category="missing">
+                <i class="fas fa-exclamation-triangle"></i> Missing Items
             </button>
         </div>
         
@@ -660,6 +822,49 @@
             </div>
             <div class="stock-grid" id="misc-items">
                 <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Missing Items Section -->
+        <div class="missing-section" id="missing-section">
+            <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Missing Items Report</h2>
+            
+            <div class="missing-controls">
+                <select id="missing-category">
+                    <option value="">Select Category</option>
+                    <option value="chocolates">Chocolates</option>
+                    <option value="fruit">Fruits</option>
+                    <option value="sauces">Sauces & Spreads</option>
+                    <option value="crepes">Crepe Items</option>
+                    <option value="drinks">Drinks & Beverages</option>
+                    <option value="cakes">Cakes & Desserts</option>
+                    <option value="crumbs">Toppings & Crumbs</option>
+                    <option value="cleaning">Cleaning Supplies</option>
+                    <option value="packaging">Packaging</option>
+                    <option value="misc">Miscellaneous</option>
+                </select>
+                <select id="missing-item">
+                    <option value="">Select Item</option>
+                </select>
+                <input type="number" id="missing-qty" placeholder="Qty" min="1" value="1">
+                <button id="add-missing-btn">
+                    <i class="fas fa-plus"></i> Add Item
+                </button>
+            </div>
+            
+            <div class="missing-list" id="missing-list">
+                <div class="empty-message" id="missing-empty">
+                    No items marked as missing yet.
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" id="whatsapp-missing-btn">
+                    <i class="fab fa-whatsapp"></i> Send Missing Items via WhatsApp
+                </button>
+                <button class="btn btn-info" id="clear-missing-btn">
+                    <i class="fas fa-broom"></i> Clear All
+                </button>
             </div>
         </div>
         
@@ -895,6 +1100,7 @@
             // DOM Elements
             const categoryBtns = document.querySelectorAll('.category-btn');
             const stockSections = document.querySelectorAll('.stock-section');
+            const missingSection = document.getElementById('missing-section');
             const orderSummary = document.getElementById('order-summary');
             const viewSummaryBtn = document.getElementById('view-summary-btn');
             const clearOrderBtn = document.getElementById('clear-order-btn');
@@ -912,6 +1118,16 @@
             const customerName = document.getElementById('customer-name');
             const customerContact = document.getElementById('customer-contact');
             
+            // Missing Items Elements
+            const missingCategory = document.getElementById('missing-category');
+            const missingItem = document.getElementById('missing-item');
+            const missingQty = document.getElementById('missing-qty');
+            const addMissingBtn = document.getElementById('add-missing-btn');
+            const missingList = document.getElementById('missing-list');
+            const missingEmpty = document.getElementById('missing-empty');
+            const whatsappMissingBtn = document.getElementById('whatsapp-missing-btn');
+            const clearMissingBtn = document.getElementById('clear-missing-btn');
+            
             // Set current date
             const today = new Date();
             orderDate.value = today.toISOString().split('T')[0];
@@ -924,6 +1140,7 @@
             
             // Order data
             let orderItems = [];
+            let missingItems = [];
             let invoiceCounter = 1001;
             
             // Initialize stock tables
@@ -945,6 +1162,13 @@
                             section.classList.add('active');
                         }
                     });
+                    
+                    // Show missing section if selected
+                    if (category === 'missing') {
+                        missingSection.classList.add('active');
+                    } else {
+                        missingSection.classList.remove('active');
+                    }
                 });
             });
             
@@ -1016,6 +1240,73 @@
                 }
             });
             
+            // Missing Items functionality
+            missingCategory.addEventListener('change', function() {
+                const category = this.value;
+                missingItem.innerHTML = '<option value="">Select Item</option>';
+                
+                if (category && stockData[category]) {
+                    stockData[category].forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.name;
+                        option.textContent = item.name;
+                        option.setAttribute('data-price', item.price);
+                        option.setAttribute('data-gst', item.gstFlag);
+                        option.setAttribute('data-gstamount', item.gstAmount);
+                        missingItem.appendChild(option);
+                    });
+                }
+            });
+            
+            addMissingBtn.addEventListener('click', function() {
+                const category = missingCategory.value;
+                const itemName = missingItem.value;
+                const quantity = parseInt(missingQty.value);
+                
+                if (!category) {
+                    showNotification('Please select a category', 'warning');
+                    return;
+                }
+                
+                if (!itemName) {
+                    showNotification('Please select an item', 'warning');
+                    return;
+                }
+                
+                if (!quantity || quantity < 1) {
+                    showNotification('Please enter a valid quantity', 'warning');
+                    return;
+                }
+                
+                const selectedOption = missingItem.options[missingItem.selectedIndex];
+                const price = parseFloat(selectedOption.getAttribute('data-price'));
+                const gstFlag = selectedOption.getAttribute('data-gst') === 'true';
+                const gstAmount = parseFloat(selectedOption.getAttribute('data-gstamount'));
+                
+                addMissingItem(itemName, price, gstFlag, gstAmount, category, quantity);
+                
+                // Reset form
+                missingItem.value = '';
+                missingQty.value = '1';
+            });
+            
+            whatsappMissingBtn.addEventListener('click', function() {
+                if (missingItems.length === 0) {
+                    showNotification('No items to report as missing', 'warning');
+                    return;
+                }
+                
+                sendWhatsAppMissing();
+            });
+            
+            clearMissingBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all missing items?')) {
+                    missingItems = [];
+                    updateMissingList();
+                    showNotification('All missing items cleared');
+                }
+            });
+            
             // Initialize stock items with quantity controls
             function initializeStockItems() {
                 for (const category in stockData) {
@@ -1039,7 +1330,10 @@
                                     <input type="number" class="qty-input" value="0" min="0" data-item="${item.name}" data-price="${item.price}" data-gst="${item.gstFlag}" data-gstamount="${item.gstAmount}" data-category="${category}">
                                     <button class="qty-btn plus">+</button>
                                 </div>
-                                <button class="add-to-order">Add to Order</button>
+                                <div>
+                                    <button class="add-to-order">Add to Order</button>
+                                    <button class="add-to-missing">Mark Missing</button>
+                                </div>
                             </div>
                         `;
                         
@@ -1080,7 +1374,7 @@
                 
                 document.querySelectorAll('.add-to-order').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        const input = this.parentElement.querySelector('.qty-input');
+                        const input = this.parentElement.parentElement.querySelector('.qty-input');
                         const quantity = parseInt(input.value);
                         
                         if (quantity > 0) {
@@ -1091,6 +1385,26 @@
                             const category = input.getAttribute('data-category');
                             
                             addItemToOrder(itemName, itemPrice, gstFlag, gstAmount, category, quantity);
+                            input.value = 0;
+                        } else {
+                            showNotification('Please set a quantity greater than 0');
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.add-to-missing').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const input = this.parentElement.parentElement.querySelector('.qty-input');
+                        const quantity = parseInt(input.value);
+                        
+                        if (quantity > 0) {
+                            const itemName = input.getAttribute('data-item');
+                            const itemPrice = parseFloat(input.getAttribute('data-price'));
+                            const gstFlag = input.getAttribute('data-gst') === 'true';
+                            const gstAmount = parseFloat(input.getAttribute('data-gstamount'));
+                            const category = input.getAttribute('data-category');
+                            
+                            addMissingItem(itemName, itemPrice, gstFlag, gstAmount, category, quantity);
                             input.value = 0;
                         } else {
                             showNotification('Please set a quantity greater than 0');
@@ -1120,6 +1434,98 @@
                 }
                 
                 showNotification(`${quantity} x ${name} added to order`);
+            }
+            
+            // Add item to missing list
+            function addMissingItem(name, price, gstFlag, gstAmount, category, quantity) {
+                // Find if item already exists in missing list
+                const existingIndex = missingItems.findIndex(item => item.name === name);
+                
+                if (existingIndex !== -1) {
+                    // Update quantity
+                    missingItems[existingIndex].quantity += quantity;
+                } else {
+                    // Add new item
+                    missingItems.push({
+                        name: name,
+                        price: price,
+                        gstFlag: gstFlag,
+                        gstAmount: gstAmount,
+                        category: category,
+                        quantity: quantity
+                    });
+                }
+                
+                updateMissingList();
+                showNotification(`${quantity} x ${name} added to missing items list`);
+            }
+            
+            // Update missing list display
+            function updateMissingList() {
+                missingList.innerHTML = '';
+                
+                if (missingItems.length === 0) {
+                    missingList.appendChild(missingEmpty);
+                    missingEmpty.style.display = 'block';
+                    return;
+                }
+                
+                missingEmpty.style.display = 'none';
+                
+                missingItems.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'missing-item';
+                    
+                    const itemTotal = item.price * item.quantity;
+                    const itemGST = item.gstFlag ? item.gstAmount * item.quantity : 0;
+                    
+                    itemElement.innerHTML = `
+                        <div class="missing-item-info">
+                            <div class="missing-item-name">${item.name}</div>
+                            <div class="missing-item-details">
+                                Quantity: ${item.quantity} | Price: $${item.price.toFixed(2)} | Total: $${itemTotal.toFixed(2)}
+                                ${item.gstFlag ? ` | GST: $${itemGST.toFixed(2)}` : ''}
+                            </div>
+                        </div>
+                        <div class="missing-item-actions">
+                            <button class="edit-btn" data-index="${index}"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn" data-index="${index}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    
+                    missingList.appendChild(itemElement);
+                });
+                
+                // Add event listeners to action buttons
+                document.querySelectorAll('.missing-item-actions .delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        const itemName = missingItems[index].name;
+                        
+                        missingItems.splice(index, 1);
+                        updateMissingList();
+                        
+                        showNotification(`${itemName} removed from missing items list`);
+                    });
+                });
+                
+                document.querySelectorAll('.missing-item-actions .edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        const item = missingItems[index];
+                        
+                        // For simplicity, we'll just remove and re-add with new quantity
+                        const newQuantity = prompt(`Enter new quantity for ${item.name}:`, item.quantity);
+                        
+                        if (newQuantity && !isNaN(newQuantity) && parseInt(newQuantity) > 0) {
+                            item.quantity = parseInt(newQuantity);
+                            updateMissingList();
+                            showNotification(`${item.name} quantity updated to ${newQuantity}`);
+                        } else if (newQuantity !== null) {
+                            showNotification('Please enter a valid quantity', 'warning');
+                        }
+                    });
+                });
             }
             
             // Update order summary display
@@ -1245,9 +1651,47 @@
                 showNotification('WhatsApp invoice generated!');
             }
             
+            // Send missing items via WhatsApp
+            function sendWhatsAppMissing() {
+                const locationKey = locationSelect.value;
+                const location = locations[locationKey];
+                
+                let message = `*Calvin's HQ - Missing Items Report*%0A%0A`;
+                message += `*Date:* ${today.toLocaleDateString('en-AU')}%0A`;
+                message += `*Location:* ${location.name}%0A`;
+                message += `*Reported by:* ${preparedBy.value || 'Not specified'}%0A%0A`;
+                message += `*Missing Items:*%0A`;
+                
+                let totalValue = 0;
+                
+                missingItems.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    const itemGST = item.gstFlag ? item.gstAmount * item.quantity : 0;
+                    
+                    totalValue += itemTotal + itemGST;
+                    
+                    message += `- ${item.quantity}x ${item.name}: $${itemTotal.toFixed(2)}${item.gstFlag ? ` (GST: $${itemGST.toFixed(2)})` : ''}%0A`;
+                });
+                
+                message += `%0A*Total Value of Missing Items:* $${totalValue.toFixed(2)}%0A%0A`;
+                message += `*Please investigate and restock these items.*`;
+                
+                const whatsappUrl = `https://wa.me/?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+                
+                showNotification('Missing items report sent via WhatsApp!');
+            }
+            
             // Show notification
-            function showNotification(message) {
+            function showNotification(message, type = 'success') {
                 notification.textContent = message;
+                
+                if (type === 'success') {
+                    notification.style.background = 'var(--success)';
+                } else if (type === 'warning') {
+                    notification.style.background = 'var(--warning)';
+                }
+                
                 notification.style.display = 'block';
                 
                 setTimeout(() => {
@@ -1258,4 +1702,3 @@
     </script>
 </body>
 </html>
-
