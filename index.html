@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calvin's HQ - Stock Ordering System</title>
+    <title>Calvin's HQ - Professional Stock Ordering System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -284,21 +284,6 @@
         
         .add-to-order:hover {
             background: var(--secondary);
-        }
-        
-        .add-to-missing {
-            background: var(--warning);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.3s;
-        }
-        
-        .add-to-missing:hover {
-            background: #e67e22;
         }
         
         .order-summary {
@@ -585,6 +570,45 @@
             font-style: italic;
         }
         
+        /* Global Missing Button */
+        .global-missing-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--warning);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .global-missing-btn:hover {
+            background: #e67e22;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+        }
+        
+        .global-missing-btn .badge {
+            background: white;
+            color: var(--warning);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
         @media (max-width: 768px) {
             .order-info {
                 flex-direction: column;
@@ -634,6 +658,32 @@
             .missing-item-actions {
                 align-self: flex-end;
             }
+            
+            .global-missing-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .order-summary, .order-summary * {
+                visibility: visible;
+            }
+            .order-summary {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+            .action-buttons {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -663,7 +713,7 @@
                     <option value="liverpool">Calvin's  Liverpool</option>
                     <option value="smithfield">Calvin's  Smithfield</option>
                     <option value="st-mery">Calvin's  St Mery</option>
-                    <option value="miranda">Calvin's Miranda</option>
+                    <option value="miranda">Calvin's  Miranda</option>
                     <option value="hurstville">Calvin's  Hurstville</option>
                 </select>
             </div>
@@ -699,9 +749,6 @@
             </button>
             <button class="category-btn" data-category="misc">
                 <i class="fas fa-ellipsis-h"></i> Miscellaneous
-            </button>
-            <button class="category-btn missing-btn" data-category="missing">
-                <i class="fas fa-exclamation-triangle"></i> Missing Items
             </button>
         </div>
         
@@ -952,6 +999,12 @@
         </div>
     </div>
     
+    <!-- Global Missing Button -->
+    <button class="global-missing-btn" id="global-missing-btn">
+        <i class="fas fa-exclamation-triangle"></i> Mark Missing
+        <span class="badge" id="missing-count">0</span>
+    </button>
+    
     <footer>
         <p>Calvin's HQ &copy; 2023 | Professional Stock Ordering & Invoicing System</p>
     </footer>
@@ -1077,23 +1130,23 @@
             const locations = {
                 liverpool: {
                     name: "Calvin's  Liverpool",
-                    address: ", Liverpool "
+                    address: "123 Crepe Street, Liverpool L1 1AB"
                 },
                 smithfield: {
                     name: "Calvin's  Smithfield",
-                    address: " Smithfield "
+                    address: "456 Sweet Avenue, Smithfield NSW 2164"
                 },
                 "st-mery": {
                     name: "Calvin's St Mery",
-                    address: " St Mery "
+                    address: "789 Dessert Road, St Mery NSW 2000"
                 },
                 miranda: {
                     name: "Calvin's  Miranda",
-                    address: " Miranda "
+                    address: "321 Pancake Boulevard, Miranda NSW 2228"
                 },
                 hurstville: {
                     name: "Calvin's Hurstville",
-                    address: " Hurstville "
+                    address: "654 Waffle Lane, Hurstville NSW 2220"
                 }
             };
             
@@ -1117,6 +1170,8 @@
             const invoiceId = document.getElementById('invoice-id');
             const customerName = document.getElementById('customer-name');
             const customerContact = document.getElementById('customer-contact');
+            const globalMissingBtn = document.getElementById('global-missing-btn');
+            const missingCount = document.getElementById('missing-count');
             
             // Missing Items Elements
             const missingCategory = document.getElementById('missing-category');
@@ -1162,14 +1217,26 @@
                             section.classList.add('active');
                         }
                     });
-                    
-                    // Show missing section if selected
-                    if (category === 'missing') {
-                        missingSection.classList.add('active');
-                    } else {
-                        missingSection.classList.remove('active');
-                    }
                 });
+            });
+            
+            // Global missing button click
+            globalMissingBtn.addEventListener('click', function() {
+                // Show missing section
+                missingSection.classList.add('active');
+                
+                // Hide other sections
+                stockSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Update category buttons
+                categoryBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Scroll to missing section
+                missingSection.scrollIntoView({ behavior: 'smooth' });
             });
             
             // Location change
@@ -1303,6 +1370,7 @@
                 if (confirm('Are you sure you want to clear all missing items?')) {
                     missingItems = [];
                     updateMissingList();
+                    updateMissingCount();
                     showNotification('All missing items cleared');
                 }
             });
@@ -1330,10 +1398,7 @@
                                     <input type="number" class="qty-input" value="0" min="0" data-item="${item.name}" data-price="${item.price}" data-gst="${item.gstFlag}" data-gstamount="${item.gstAmount}" data-category="${category}">
                                     <button class="qty-btn plus">+</button>
                                 </div>
-                                <div>
-                                    <button class="add-to-order">Add to Order</button>
-                                    <button class="add-to-missing">Mark Missing</button>
-                                </div>
+                                <button class="add-to-order">Add to Order</button>
                             </div>
                         `;
                         
@@ -1374,7 +1439,7 @@
                 
                 document.querySelectorAll('.add-to-order').forEach(btn => {
                     btn.addEventListener('click', function() {
-                        const input = this.parentElement.parentElement.querySelector('.qty-input');
+                        const input = this.parentElement.querySelector('.qty-input');
                         const quantity = parseInt(input.value);
                         
                         if (quantity > 0) {
@@ -1385,26 +1450,6 @@
                             const category = input.getAttribute('data-category');
                             
                             addItemToOrder(itemName, itemPrice, gstFlag, gstAmount, category, quantity);
-                            input.value = 0;
-                        } else {
-                            showNotification('Please set a quantity greater than 0');
-                        }
-                    });
-                });
-                
-                document.querySelectorAll('.add-to-missing').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const input = this.parentElement.parentElement.querySelector('.qty-input');
-                        const quantity = parseInt(input.value);
-                        
-                        if (quantity > 0) {
-                            const itemName = input.getAttribute('data-item');
-                            const itemPrice = parseFloat(input.getAttribute('data-price'));
-                            const gstFlag = input.getAttribute('data-gst') === 'true';
-                            const gstAmount = parseFloat(input.getAttribute('data-gstamount'));
-                            const category = input.getAttribute('data-category');
-                            
-                            addMissingItem(itemName, itemPrice, gstFlag, gstAmount, category, quantity);
                             input.value = 0;
                         } else {
                             showNotification('Please set a quantity greater than 0');
@@ -1457,6 +1502,7 @@
                 }
                 
                 updateMissingList();
+                updateMissingCount();
                 showNotification(`${quantity} x ${name} added to missing items list`);
             }
             
@@ -1504,6 +1550,7 @@
                         
                         missingItems.splice(index, 1);
                         updateMissingList();
+                        updateMissingCount();
                         
                         showNotification(`${itemName} removed from missing items list`);
                     });
@@ -1520,12 +1567,25 @@
                         if (newQuantity && !isNaN(newQuantity) && parseInt(newQuantity) > 0) {
                             item.quantity = parseInt(newQuantity);
                             updateMissingList();
+                            updateMissingCount();
                             showNotification(`${item.name} quantity updated to ${newQuantity}`);
                         } else if (newQuantity !== null) {
                             showNotification('Please enter a valid quantity', 'warning');
                         }
                     });
                 });
+            }
+            
+            // Update missing count badge
+            function updateMissingCount() {
+                const count = missingItems.length;
+                missingCount.textContent = count;
+                
+                if (count > 0) {
+                    globalMissingBtn.style.background = '#e67e22';
+                } else {
+                    globalMissingBtn.style.background = 'var(--warning)';
+                }
             }
             
             // Update order summary display
@@ -1702,4 +1762,3 @@
     </script>
 </body>
 </html>
-
