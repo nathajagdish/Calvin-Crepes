@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -750,6 +751,10 @@
             <button class="category-btn" data-category="misc">
                 <i class="fas fa-ellipsis-h"></i> Miscellaneous
             </button>
+            <!-- New Cash & Change Category Button -->
+            <button class="category-btn" data-category="cash">
+                <i class="fas fa-money-bill-wave"></i> Cash & Change
+            </button>
         </div>
         
         <!-- Chocolates Section -->
@@ -871,6 +876,18 @@
                 <!-- Items will be populated by JavaScript -->
             </div>
         </div>
+
+        <!-- Cash & Change Section -->
+        <div class="stock-section" id="cash-section">
+            <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Cash & Change</h2>
+            <div class="search-box">
+                <input type="text" id="cash-search" placeholder="Search cash denominations...">
+                <button><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="stock-grid" id="cash-items">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+        </div>
         
         <!-- Missing Items Section -->
         <div class="missing-section" id="missing-section">
@@ -889,6 +906,7 @@
                     <option value="cleaning">Cleaning Supplies</option>
                     <option value="packaging">Packaging</option>
                     <option value="misc">Miscellaneous</option>
+                    <option value="cash">Cash & Change</option>
                 </select>
                 <select id="missing-item">
                     <option value="">Select Item</option>
@@ -1044,6 +1062,7 @@
                     { name: "ICE CREAM VANILLA GOLD 10LT Everest", price: 21.5, gstFlag: true, gstAmount: 2.15 },
                     { name: "WAFFLE BELGIAM Crtn", price: 36, gstFlag: true, gstAmount: 3.69 },
                     { name: "Crepe Mix", price: 20, gstFlag: true, gstAmount: 2 },
+                    { name: "Pancake Mix", price: 15, gstFlag: true, gstAmount: 1.5 }, // Added Pancake Mix
                     { name: "Pancakes 5 pieces", price: 10, gstFlag: false, gstAmount: 0 },
                     { name: "DIXIES ICE CREAM CUPS VANILLA 72X100ML Everest", price: 33, gstFlag: true, gstAmount: 3.3 },
                     { name: "DESSERT SAUCE CHOCOLATE FUDGE 500ml", price: 10.61, gstFlag: false, gstAmount: 0 },
@@ -1124,6 +1143,14 @@
                     { name: "Rice bubbles", price: 4, gstFlag: false, gstAmount: 0 },
                     { name: "Katifi prep", price: 5, gstFlag: false, gstAmount: 0 },
                     { name: "Coconut Flakes", price: 5.9, gstFlag: false, gstAmount: 0 }
+                ],
+                cash: [
+                    { name: "5 Cent", price: 0.05, gstFlag: false, gstAmount: 0 },
+                    { name: "10 Cent", price: 0.10, gstFlag: false, gstAmount: 0 },
+                    { name: "20 Cent", price: 0.20, gstFlag: false, gstAmount: 0 },
+                    { name: "$5 Note", price: 5.00, gstFlag: false, gstAmount: 0 },
+                    { name: "$10 Note", price: 10.00, gstFlag: false, gstAmount: 0 },
+                    { name: "$20 Note", price: 20.00, gstFlag: false, gstAmount: 0 }
                 ]
             };
             
@@ -1763,5 +1790,4 @@
     </script>
 </body>
 </html>
-
-
+```
