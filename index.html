@@ -1,377 +1,694 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calvin's HQ - Professional Stock Ordering System</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #8B4513;
-            --secondary: #D2691E;
-            --accent: #FFD700;
-            --light: #FFF8DC;
-            --dark: #5D4037;
-            --text: #333333;
-            --success: #4CAF50;
-            --danger: #e74c3c;
-            --info: #3498db;
-            --warning: #f39c12;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f9f5f0; color: var(--text); line-height: 1.6; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header { background: linear-gradient(to right, var(--primary), var(--secondary)); color: white; padding: 20px 0; text-align: center; border-radius: 10px 10px 0 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-bottom: 30px; }
-        .logo { font-size: 2.5rem; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 15px; }
-        .logo i { color: var(--accent); }
-        .tagline { font-style: italic; opacity: 0.9; }
-        .order-info { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); margin-bottom: 30px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-        .info-group { display: flex; flex-direction: column; gap: 5px; }
-        .info-group label { font-weight: 600; color: var(--dark); }
-        .info-group input, .info-group select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; min-width: 200px; }
-        .categories { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; justify-content: center; }
-        .category-btn { background: var(--light); border: 2px solid var(--primary); padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: 600; color: var(--primary); transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
-        .category-btn:hover, .category-btn.active { background: var(--primary); color: white; }
-        .stock-section { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); margin-bottom: 30px; display: none; }
-        .stock-section.active { display: block; }
-        .section-title { color: var(--primary); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px dashed var(--light); display: flex; align-items: center; gap: 10px; }
-        .search-box { margin-bottom: 20px; display: flex; gap: 10px; }
-        .search-box input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
-        .search-box button { background: var(--info); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
-        .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stock-item { background: var(--light); border-radius: 10px; padding: 15px; transition: transform 0.3s, box-shadow 0.3s; border: 1px solid #e0d6c8; display: flex; flex-direction: column; justify-content: space-between; }
-        .stock-item:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
-        .item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .item-name { font-weight: 600; color: var(--dark); font-size: 1.1rem; flex: 1; }
-        .item-price { font-weight: bold; color: var(--primary); background: white; padding: 3px 10px; border-radius: 20px; font-size: 0.9rem; margin-left: 10px; }
-        .gst-flag { font-size: 0.8rem; color: var(--success); background: rgba(76, 175, 80, 0.1); padding: 2px 8px; border-radius: 10px; margin-left: 5px; }
-        .order-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; }
-        .qty-control { display: flex; align-items: center; gap: 10px; }
-        .qty-input { width: 60px; padding: 5px; border: 1px solid #ddd; border-radius: 5px; text-align: center; }
-        .qty-btn { background: var(--light); border: 1px solid #ddd; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
-        .add-to-order { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 600; transition: background 0.3s; }
-        .add-to-order:hover { background: var(--secondary); }
-        .order-summary { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); margin-bottom: 30px; display: none; }
-        .order-summary.active { display: block; }
-        .summary-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .summary-table th, .summary-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
-        .summary-table th { background: var(--light); font-weight: 600; color: var(--dark); }
-        .remove-btn { color: var(--danger); cursor: pointer; background: none; border: none; font-size: 1.2rem; }
-        .invoice-preview { background: #f9f9f9; padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px dashed #ddd; }
-        .invoice-header { text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--light); }
-        .invoice-details { display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 20px; }
-        .invoice-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .invoice-table th, .invoice-table td { padding: 10px 15px; text-align: left; border-bottom: 1px solid #eee; }
-        .invoice-table th { background: var(--light); font-weight: 600; color: var(--dark); }
-        .invoice-summary { background: var(--light); padding: 15px; border-radius: 5px; margin-top: 20px; }
-        .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .total-row { font-weight: bold; font-size: 1.2rem; border-top: 2px dashed #ddd; padding-top: 10px; margin-top: 10px; color: var(--primary); }
-        .action-buttons { display: flex; gap: 15px; margin-top: 25px; justify-content: center; flex-wrap: wrap; }
-        .btn { padding: 12px 25px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--secondary); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-success:hover { background: #45a049; }
-        .btn-info { background: var(--info); color: white; }
-        .btn-info:hover { background: #2980b9; }
-        .btn-warning { background: var(--warning); color: white; }
-        .btn-warning:hover { background: #e67e22; }
-        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; background: var(--success); color: white; border-radius: 5px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); display: none; z-index: 1000; }
-        footer { text-align: center; margin-top: 40px; padding: 20px; color: #777; font-size: 0.9rem; }
-        .missing-section { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); margin-bottom: 30px; display: none; }
-        .missing-section.active { display: block; }
-        .missing-controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        .missing-controls select, .missing-controls input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
-        .missing-controls select { flex: 1; min-width: 200px; }
-        .missing-controls input { width: 120px; }
-        .missing-controls button { background: var(--warning); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: 600; }
-        .missing-list { margin-top: 20px; }
-        .missing-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #eee; background: #fff9e6; margin-bottom: 8px; border-radius: 5px; }
-        .missing-item-info { flex: 1; }
-        .missing-item-name { font-weight: 600; color: var(--dark); }
-        .missing-item-details { font-size: 0.9rem; color: #777; margin-top: 3px; }
-        .missing-item-actions { display: flex; gap: 10px; }
-        .missing-item-actions button { background: none; border: none; cursor: pointer; font-size: 1.1rem; }
-        .missing-item-actions .edit-btn { color: var(--info); }
-        .missing-item-actions .delete-btn { color: var(--danger); }
-        .empty-message { text-align: center; padding: 20px; color: #777; font-style: italic; }
-        .global-missing-btn { position: fixed; bottom: 30px; right: 30px; background: var(--warning); color: white; border: none; border-radius: 50px; padding: 15px 25px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); z-index: 999; display: flex; align-items: center; gap: 8px; transition: all 0.3s; }
-        .global-missing-btn:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25); }
-        .global-missing-btn .badge { background: white; color: var(--warning); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; }
-        @media (max-width: 768px) {
-            .order-info { flex-direction: column; }
-            .info-group input, .info-group select { min-width: 100%; }
-            .categories { flex-direction: column; align-items: center; }
-            .category-btn { width: 100%; justify-content: center; }
-            .stock-grid { grid-template-columns: 1fr; }
-            .action-buttons { flex-direction: column; }
-            .invoice-details { flex-direction: column; }
-            .missing-controls { flex-direction: column; }
-            .missing-controls select, .missing-controls input { width: 100%; }
-            .missing-item { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .missing-item-actions { align-self: flex-end; }
-            .global-missing-btn { bottom: 20px; right: 20px; padding: 12px 20px; font-size: 0.9rem; }
-        }
-        @media print {
-            body * { visibility: hidden; }
-            .order-summary, .order-summary * { visibility: visible; }
-            .order-summary { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; }
-            .action-buttons { display: none; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calvin's HQ - Stock Ordering</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--primary:#8B4513;--primary-dark:#6d3610;--secondary:#D2691E;--light:#FFF8F0;--border:#E8DCC8;--dark:#3E2723;--muted:#7A7A7A;--success:#2E7D32;--danger:#C62828;--info:#1565C0;--warning:#E65100;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F5EFE6;color:#2C2C2C;line-height:1.5;padding-bottom:100px;}
+.container{max-width:1200px;margin:0 auto;padding:16px;}
+.app-header{background:linear-gradient(135deg,#8B4513,#D2691E);color:#fff;border-radius:12px;padding:20px;margin-bottom:20px;}
+.app-header h1{font-size:1.4rem;display:flex;align-items:center;gap:10px;}
+.app-header p{font-size:.85rem;opacity:.9;margin-top:4px;}
+.info-bar{background:#fff;border-radius:12px;padding:16px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:.75rem;font-weight:600;text-transform:uppercase;color:#7A7A7A;}
+.field input,.field select{padding:10px;border:1.5px solid #E8DCC8;border-radius:8px;font-size:.95rem;background:#FFFDF9;font-family:inherit;}
+.field input:focus,.field select:focus{outline:none;border-color:#8B4513;}
+.tabs-wrapper{position:sticky;top:0;z-index:50;background:#F5EFE6;padding:10px 0;margin:-10px 0 10px;}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;background:#fff;border:1.5px solid #E8DCC8;color:#3E2723;padding:9px 16px;border-radius:50px;font-size:.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap;font-family:inherit;}
+.tab.active{background:#8B4513;border-color:#8B4513;color:#fff;}
+.section{background:#fff;border-radius:12px;padding:18px;margin-bottom:20px;display:none;}
+.section.active{display:block;}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.section-head h2{font-size:1.1rem;color:#8B4513;display:flex;align-items:center;gap:8px;}
+.item-count{font-size:.75rem;color:#7A7A7A;background:#FFF8F0;padding:3px 10px;border-radius:20px;font-weight:600;}
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#7A7A7A;font-size:.9rem;}
+.search-wrap input{width:100%;padding:11px 14px 11px 38px;border:1.5px solid #E8DCC8;border-radius:8px;font-size:.95rem;background:#FFFDF9;font-family:inherit;}
+.search-wrap input:focus{outline:none;border-color:#8B4513;}
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.item-card{background:#FFFDF9;border:1.5px solid #E8DCC8;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.item-name{font-weight:600;color:#3E2723;font-size:.92rem;line-height:1.3;}
+.badge{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;text-transform:uppercase;margin-top:4px;display:inline-block;}
+.badge-gst{background:#E8F5E9;color:#2E7D32;}
+.badge-cash{background:#FFF3E0;color:#E65100;}
+.item-price{font-weight:700;color:#8B4513;font-size:.95rem;white-space:nowrap;}
+.item-controls{display:flex;gap:8px;align-items:stretch;}
+.qty-group{display:flex;align-items:center;border:1.5px solid #E8DCC8;border-radius:8px;background:#fff;overflow:hidden;}
+.qty-btn{background:transparent;border:none;width:34px;height:34px;font-size:1.1rem;font-weight:600;color:#8B4513;cursor:pointer;font-family:inherit;}
+.qty-btn:hover{background:#FFF8F0;}
+.qty-input{width:42px;border:none;text-align:center;font-size:.95rem;font-weight:600;background:transparent;color:#3E2723;font-family:inherit;-moz-appearance:textfield;}
+.qty-input::-webkit-outer-spin-button,.qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.qty-input:focus{outline:none;}
+.btn-add{flex:1;background:#8B4513;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-add:hover{background:#6d3610;}
+.empty-state{text-align:center;padding:40px 20px;color:#7A7A7A;}
+.empty-state i{font-size:2.5rem;opacity:.3;margin-bottom:12px;display:block;}
+.missing-controls{display:grid;grid-template-columns:1fr 1fr auto auto;gap:10px;margin-bottom:16px;}
+.missing-controls select,.missing-controls input{padding:10px;border:1.5px solid #E8DCC8;border-radius:8px;font-size:.9rem;background:#FFFDF9;font-family:inherit;}
+.missing-controls input{width:90px;}
+.missing-controls button{background:#E65100;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;font-size:.9rem;font-family:inherit;}
+.missing-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#FFF3E0;border-left:4px solid #E65100;border-radius:8px;margin-bottom:8px;gap:10px;}
+.missing-item-info{flex:1;min-width:0;}
+.missing-item-name{font-weight:600;color:#3E2723;font-size:.9rem;}
+.missing-item-details{font-size:.78rem;color:#7A7A7A;margin-top:2px;}
+.missing-item-actions{display:flex;gap:4px;}
+.icon-btn{background:transparent;border:none;width:32px;height:32px;border-radius:6px;cursor:pointer;color:#7A7A7A;font-size:.9rem;}
+.icon-btn.danger:hover{color:#C62828;background:#FFEBEE;}
+.invoice{background:#fff;border:1px solid #E8DCC8;border-radius:8px;overflow:hidden;}
+.invoice-head{text-align:center;padding:20px 16px;background:linear-gradient(135deg,#FFF8F0,#fff);border-bottom:2px solid #E8DCC8;}
+.invoice-head h3{color:#8B4513;font-size:1.15rem;margin-bottom:6px;}
+.invoice-head .venue-name{font-size:.95rem;font-weight:600;color:#3E2723;}
+.invoice-head .venue-meta{font-size:.8rem;color:#7A7A7A;margin-top:2px;}
+.invoice-body{padding:16px;}
+.invoice-info{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px dashed #E8DCC8;}
+.invoice-info-block h4{font-size:.72rem;text-transform:uppercase;color:#7A7A7A;margin-bottom:6px;font-weight:700;}
+.invoice-info-block p{font-size:.85rem;color:#2C2C2C;margin-bottom:3px;}
+.invoice-table{width:100%;border-collapse:collapse;font-size:.85rem;}
+.invoice-table th{text-align:left;padding:8px 6px;font-size:.72rem;text-transform:uppercase;color:#7A7A7A;font-weight:700;border-bottom:2px solid #E8DCC8;}
+.invoice-table th:last-child,.invoice-table td:last-child{text-align:right;}
+.invoice-table td{padding:10px 6px;border-bottom:1px solid #F0F0F0;vertical-align:top;}
+.invoice-totals{margin-top:16px;padding:14px;background:#FFF8F0;border-radius:8px;}
+.total-row{display:flex;justify-content:space-between;padding:5px 0;font-size:.9rem;}
+.total-row.grand{border-top:2px solid #8B4513;margin-top:8px;padding-top:10px;font-size:1.1rem;font-weight:700;color:#8B4513;}
+.order-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E8DCC8;padding:12px 16px;display:flex;gap:10px;align-items:center;box-shadow:0 -4px 20px rgba(0,0,0,.08);z-index:100;transform:translateY(100%);transition:transform .3s;}
+.order-bar.visible{transform:translateY(0);}
+.order-bar-info{flex:1;}
+.order-bar-info .count{font-size:.75rem;color:#7A7A7A;font-weight:600;}
+.order-bar-info .total{font-size:1.1rem;font-weight:700;color:#8B4513;}
+.order-bar-btn{background:#8B4513;color:#fff;border:none;border-radius:8px;padding:12px 22px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.btn{padding:11px 20px;border:none;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:inherit;}
+.btn-primary{background:#8B4513;color:#fff;}
+.btn-success{background:#2E7D32;color:#fff;}
+.btn-info{background:#1565C0;color:#fff;}
+.btn-warning{background:#E65100;color:#fff;}
+.btn-outline{background:#fff;color:#8B4513;border:1.5px solid #8B4513;}
+.btn-danger{background:#C62828;color:#fff;}
+.toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-20px);background:#3E2723;color:#fff;padding:12px 20px;border-radius:8px;font-size:.88rem;font-weight:500;opacity:0;pointer-events:none;transition:all .3s;z-index:9999;max-width:calc(100% - 32px);}
+.toast.show{opacity:1;transform:translate(-50%,0);}
+.toast.success{background:#2E7D32;}
+.toast.warning{background:#E65100;}
+.toast.error{background:#C62828;}
+.app-footer{text-align:center;padding:30px 16px 20px;color:#7A7A7A;font-size:.78rem;}
+@media(max-width:700px){.items-grid{grid-template-columns:1fr;}.missing-controls{grid-template-columns:1fr 1fr;}.missing-controls select{grid-column:1/-1;}.invoice-info{grid-template-columns:1fr;}.actions .btn{flex:1 1 calc(50% - 5px);justify-content:center;}}
+@media print{body{background:#fff;padding:0;}.app-header,.info-bar,.tabs-wrapper,.section,.order-bar,.app-footer,.actions,.toast{display:none!important;}#summary-section{display:block!important;box-shadow:none;border:none;padding:0;}.invoice{border:1px solid #ccc;}}
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <i class="fas fa-pancakes"></i>
-                Calvin's HQ - Professional Stock Ordering System
-                <i class="fas fa-pancakes"></i>
+
+<div class="container">
+    <header class="app-header">
+        <h1><i class="fas fa-pancakes"></i> Calvin's HQ</h1>
+        <p>Stock Ordering &amp; Missing Items System</p>
+    </header>
+    <div class="info-bar">
+        <div class="field"><label for="order-date">Order Date</label><input type="date" id="order-date"></div>
+        <div class="field"><label for="prepared-by">Prepared By</label><input type="text" id="prepared-by" placeholder="Your name"></div>
+        <div class="field"><label for="location">Venue</label><select id="location"></select></div>
+    </div>
+    <div class="tabs-wrapper"><div class="tabs" id="tabs"></div></div>
+    <div id="sections"></div>
+
+    <div class="section" id="missing-section">
+        <div class="section-head">
+            <h2><i class="fas fa-exclamation-triangle"></i> Missing Items Report</h2>
+            <span class="item-count" id="missing-count-badge">0 items</span>
+        </div>
+        <div class="missing-controls">
+            <select id="missing-category"><option value="">Select Category…</option></select>
+            <select id="missing-item"><option value="">Select Item…</option></select>
+            <input type="number" id="missing-qty" value="1" min="1">
+            <button id="add-missing-btn"><i class="fas fa-plus"></i> Add</button>
+        </div>
+        <div id="missing-list"></div>
+        <div class="actions">
+            <button class="btn btn-warning" id="whatsapp-missing-btn"><i class="fab fa-whatsapp"></i> Send Missing Report</button>
+            <button class="btn btn-outline" id="clear-missing-btn"><i class="fas fa-broom"></i> Clear All</button>
+        </div>
+    </div>
+
+    <div class="section" id="summary-section">
+        <div class="section-head"><h2><i class="fas fa-file-invoice"></i> Order Summary</h2></div>
+        <div class="invoice">
+            <div class="invoice-head">
+                <h3>Calvin's Crepes</h3>
+                <div class="venue-name" id="inv-venue-name">—</div>
+                <div class="venue-meta" id="inv-venue-meta">—</div>
             </div>
-            <p class="tagline">Order Supplies, Track Missing Items & Generate Invoices</p>
-        </header>
-        
-        <div class="order-info">
-            <div class="info-group">
-                <label for="order-date">Order Date</label>
-                <input type="date" id="order-date">
-            </div>
-            <div class="info-group">
-                <label for="prepared-by">Prepared By</label>
-                <input type="text" id="prepared-by" placeholder="Enter your name">
-            </div>
-            <div class="info-group">
-                <label for="location">Select Venue</label>
-                <select id="location">
-                    <option value="glendenning">CALVIN CREPES - GLENDENNING - [12019]</option>
-                    <option value="baulkham-hills">CALVIN'S CREPES - BAULKHAM HILLS - [11824]</option>
-                    <option value="belmore">CALVINS CREPES - BELMORE - [6216]</option>
-                    <option value="guildford">CALVIN'S CREPES - GUILDFORD - [11964]</option>
-                    <option value="hq">CALVIN'S CREPES - HQ - [11967]</option>
-                    <option value="liverpool">CALVIN'S CREPES - LIVERPOOL - [11825]</option>
-                    <option value="peakhurst">CALVIN'S CREPES - PEAKHURST - [11827]</option>
-                    <option value="smithfield">CALVIN'S CREPES - SMITHFIELD - [11823]</option>
-                    <option value="st-marys">CALVIN'S CREPES - ST MARY'S - [11826]</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="categories">
-            <button class="category-btn active" data-category="chocolates"><i class="fas fa-candy-cane"></i> Chocolates</button>
-            <button class="category-btn" data-category="fruit"><i class="fas fa-apple-alt"></i> Fruits</button>
-            <button class="category-btn" data-category="sauces"><i class="fas fa-wine-bottle"></i> Sauces & Spreads</button>
-            <button class="category-btn" data-category="crepes"><i class="fas fa-bread-slice"></i> Crepe Items</button>
-            <button class="category-btn" data-category="drinks"><i class="fas fa-coffee"></i> Drinks & Beverages</button>
-            <button class="category-btn" data-category="cakes"><i class="fas fa-birthday-cake"></i> Cakes & Desserts</button>
-            <button class="category-btn" data-category="crumbs"><i class="fas fa-cookie-bite"></i> Toppings & Crumbs</button>
-            <button class="category-btn" data-category="cleaning"><i class="fas fa-pump-soap"></i> Cleaning Supplies</button>
-            <button class="category-btn" data-category="packaging"><i class="fas fa-box"></i> Packaging</button>
-            <button class="category-btn" data-category="misc"><i class="fas fa-ellipsis-h"></i> Miscellaneous</button>
-            <button class="category-btn" data-category="cash"><i class="fas fa-money-bill-wave"></i> Cash & Change</button>
-        </div>
-        
-        <div class="stock-section active" id="chocolates-section">
-            <h2 class="section-title"><i class="fas fa-candy-cane"></i> Chocolates</h2>
-            <div class="stock-grid" id="chocolates-items"></div>
-        </div>
-        <div class="stock-section" id="fruit-section">
-            <h2 class="section-title"><i class="fas fa-apple-alt"></i> Fruits</h2>
-            <div class="stock-grid" id="fruit-items"></div>
-        </div>
-        <div class="stock-section" id="sauces-section">
-            <h2 class="section-title"><i class="fas fa-wine-bottle"></i> Sauces & Spreads</h2>
-            <div class="stock-grid" id="sauces-items"></div>
-        </div>
-        <div class="stock-section" id="crepes-section">
-            <h2 class="section-title"><i class="fas fa-bread-slice"></i> Crepe Items</h2>
-            <div class="stock-grid" id="crepes-items"></div>
-        </div>
-        <div class="stock-section" id="drinks-section">
-            <h2 class="section-title"><i class="fas fa-coffee"></i> Drinks & Beverages</h2>
-            <div class="stock-grid" id="drinks-items"></div>
-        </div>
-        <div class="stock-section" id="cakes-section">
-            <h2 class="section-title"><i class="fas fa-birthday-cake"></i> Cakes & Desserts</h2>
-            <div class="stock-grid" id="cakes-items"></div>
-        </div>
-        <div class="stock-section" id="crumbs-section">
-            <h2 class="section-title"><i class="fas fa-cookie-bite"></i> Toppings & Crumbs</h2>
-            <div class="stock-grid" id="crumbs-items"></div>
-        </div>
-        <div class="stock-section" id="cleaning-section">
-            <h2 class="section-title"><i class="fas fa-pump-soap"></i> Cleaning Supplies</h2>
-            <div class="stock-grid" id="cleaning-items"></div>
-        </div>
-        <div class="stock-section" id="packaging-section">
-            <h2 class="section-title"><i class="fas fa-box"></i> Packaging</h2>
-            <div class="stock-grid" id="packaging-items"></div>
-        </div>
-        <div class="stock-section" id="misc-section">
-            <h2 class="section-title"><i class="fas fa-ellipsis-h"></i> Miscellaneous</h2>
-            <div class="stock-grid" id="misc-items"></div>
-        </div>
-        <div class="stock-section" id="cash-section">
-            <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Cash & Change</h2>
-            <div class="stock-grid" id="cash-items"></div>
-        </div>
-        
-        <div class="missing-section" id="missing-section">
-            <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Missing Items Report</h2>
-            <div class="missing-controls">
-                <select id="missing-category">
-                    <option value="">Select Category</option>
-                    <option value="chocolates">Chocolates</option>
-                    <option value="fruit">Fruits</option>
-                    <option value="sauces">Sauces & Spreads</option>
-                    <option value="crepes">Crepe Items</option>
-                    <option value="drinks">Drinks & Beverages</option>
-                    <option value="cakes">Cakes & Desserts</option>
-                    <option value="crumbs">Toppings & Crumbs</option>
-                    <option value="cleaning">Cleaning Supplies</option>
-                    <option value="packaging">Packaging</option>
-                    <option value="misc">Miscellaneous</option>
-                    <option value="cash">Cash & Change</option>
-                </select>
-                <select id="missing-item"><option value="">Select Item</option></select>
-                <input type="number" id="missing-qty" placeholder="Qty" min="1" value="1">
-                <button id="add-missing-btn"><i class="fas fa-plus"></i> Add Item</button>
-            </div>
-            <div class="missing-list" id="missing-list">
-                <div class="empty-message" id="missing-empty">No items marked as missing yet.</div>
-            </div>
-            <div class="action-buttons">
-                <button class="btn btn-warning" id="whatsapp-missing-btn"><i class="fab fa-whatsapp"></i> Send Missing Items via WhatsApp</button>
-                <button class="btn btn-info" id="clear-missing-btn"><i class="fas fa-broom"></i> Clear All</button>
-            </div>
-        </div>
-        
-        <div class="order-summary" id="order-summary">
-            <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Order Summary</h2>
-            <div class="invoice-preview">
-                <div class="invoice-header">
-                    <h3>Calvin's HQ - Stock Order Invoice</h3>
-                    <p id="invoice-location">CALVIN CREPES - GLENDENNING [12019]</p>
-                    <p id="invoice-date">Date: Loading...</p>
-                    <p id="invoice-number">Order #: CR-<span id="invoice-id">0001</span></p>
-                </div>
-                <div class="invoice-details">
-                    <div>
-                        <h4>Order Details:</h4>
-                        <p id="customer-name">Prepared by: </p>
-                        <p id="customer-contact">Venue: </p>
+            <div class="invoice-body">
+                <div class="invoice-info">
+                    <div class="invoice-info-block">
+                        <h4>Order Details</h4>
+                        <p id="inv-order-no">Order #: —</p>
+                        <p id="inv-date">Date: —</p>
+                        <p id="inv-prepared">Prepared by: —</p>
                     </div>
-                    <div>
-                        <h4>Business Details:</h4>
-                        <p>Calvin's Crepes</p>
-                        <p id="business-address">Venue code</p>
+                    <div class="invoice-info-block">
+                        <h4>Deliver To</h4>
+                        <p id="inv-venue-full">—</p>
+                        <p id="inv-venue-code">—</p>
                     </div>
                 </div>
                 <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Quantity</th>
-                            <th>Unit Price (AUD)</th>
-                            <th>GST Amount</th>
-                            <th>Total (AUD)</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summary-items"></tbody>
+                    <thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>GST</th><th>Total</th></tr></thead>
+                    <tbody id="invoice-items"></tbody>
                 </table>
-                <div class="invoice-summary">
-                    <div class="summary-row"><span>Subtotal (excl. GST):</span><span id="subtotal">$0.00</span></div>
-                    <div class="summary-row"><span>Total GST:</span><span id="gst">$0.00</span></div>
-                    <div class="summary-row total-row"><span>Total (incl. GST):</span><span id="total">$0.00</span></div>
+                <div class="invoice-totals">
+                    <div class="total-row"><span>Subtotal (excl. GST)</span><span id="inv-subtotal">$0.00</span></div>
+                    <div class="total-row"><span>GST</span><span id="inv-gst">$0.00</span></div>
+                    <div class="total-row grand"><span>Total (AUD)</span><span id="inv-total">$0.00</span></div>
                 </div>
             </div>
-            <div class="action-buttons">
-                <button class="btn btn-info" id="print-order-btn"><i class="fas fa-print"></i> Print Invoice</button>
-                <button class="btn btn-success" id="whatsapp-btn"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
-                <button class="btn btn-primary" id="new-order-btn"><i class="fas fa-file"></i> New Order</button>
-            </div>
         </div>
-        
-        <div class="action-buttons">
-            <button class="btn btn-primary" id="view-summary-btn"><i class="fas fa-eye"></i> View Order Summary</button>
-            <button class="btn btn-info" id="clear-order-btn"><i class="fas fa-broom"></i> Clear All Orders</button>
+        <div class="actions">
+            <button class="btn btn-info" id="print-btn"><i class="fas fa-print"></i> Print</button>
+            <button class="btn btn-success" id="whatsapp-btn"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
+            <button class="btn btn-outline" id="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+            <button class="btn btn-danger" id="new-order-btn"><i class="fas fa-plus"></i> New Order</button>
         </div>
-        
-        <div class="notification" id="notification">Item added to order successfully!</div>
     </div>
-    
-    <button class="global-missing-btn" id="global-missing-btn">
-        <i class="fas fa-exclamation-triangle"></i> Mark Missing
-        <span class="badge" id="missing-count">0</span>
-    </button>
-    
-    <footer>
-        <p>Calvin's HQ &copy; 2026 | Professional Stock Ordering & Invoicing System</p>
-    </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const stockData = {
-                chocolates: [
-                    { name: "MILK CHOCOLATE VHP 10KG", price: 280, gstFlag: false, gstAmount: 0 },
-                    { name: "WHITE CALLET 28% 10KG BAG", price: 330, gstFlag: false, gstAmount: 0 },
-                    { name: "Box of bueno", price: 38, gstFlag: false, gstAmount: 0 },
-                    { name: "Kitkat block", price: 5, gstFlag: false, gstAmount: 0 },
-                    { name: "Caramilk block", price: 7, gstFlag: false, gstAmount: 0 },
-                    { name: "Mars Bar 20", price: 12.5, gstFlag: false, gstAmount: 0 },
-                    { name: "Ferrero 10 pieces", price: 18, gstFlag: false, gstAmount: 0 },
-                    { name: "Snickers Bar 10 pieces", price: 12.5, gstFlag: false, gstAmount: 0 }
-                ],
-                fruit: [
-                    { name: "Strawberry", price: 60, gstFlag: false, gstAmount: 0 },
-                    { name: "Kiwi 5", price: 5, gstFlag: false, gstAmount: 0 },
-                    { name: "Box of Banana", price: 28, gstFlag: false, gstAmount: 0 },
-                    { name: "Mint", price: 2, gstFlag: false, gstAmount: 0 },
-                    { name: "Blueberries", price: 3, gstFlag: false, gstAmount: 0 }
-                ],
-                sauces: [
-                    { name: "Pistachio 5kgs", price: 105, gstFlag: false, gstAmount: 0 },
-                    { name: "Hazelnut 5kgs", price: 54.5, gstFlag: false, gstAmount: 0 },
-                    { name: "Nutella 3kg x2", price: 73, gstFlag: false, gstAmount: 0 },
-                    { name: "SYRUP MAPLE (PURE) 1LT QUEENS", price: 34, gstFlag: false, gstAmount: 0 },
-                    { name: "SYRUP MAPLE 4LT (PURE) CHEFS CHOICE", price: 88, gstFlag: false, gstAmount: 0 },
-                    { name: "PEANUT BUTTER CREAMY SMOOTH 1.8KG SKIPPY", price: 14, gstFlag: false, gstAmount: 0 },
-                    { name: "Biscoff pack of 4", price: 92, gstFlag: false, gstAmount: 0 },
-                    { name: "Bueno Sauce 5kgs", price: 48.5, gstFlag: false, gstAmount: 0 }
-                ],
-                crepes: [
-                    { name: "ICE CREAM VANILLA GOLD 10LT Everest", price: 21.5, gstFlag: true, gstAmount: 2.15 },
-                    { name: "WAFFLE BELGIAM Crtn", price: 36, gstFlag: true, gstAmount: 3.69 },
-                    { name: "Crepe Mix", price: 20, gstFlag: true, gstAmount: 2 },
-                    { name: "Pancake Mix", price: 15, gstFlag: true, gstAmount: 1.5 },
-                    { name: "Pancakes 5 pieces", price: 10, gstFlag: false, gstAmount: 0 },
-                    { name: "DIXIES ICE CREAM CUPS VANILLA 72X100ML Everest", price: 33, gstFlag: true, gstAmount: 3.3 },
-                    { name: "DESSERT SAUCE CHOCOLATE FUDGE 500ml", price: 10.61, gstFlag: false, gstAmount: 0 },
-                    { name: "DESSERT SAUCE BELG CHOCOLATE 1LT", price: 20.25, gstFlag: false, gstAmount: 0 },
-                    { name: "OIL CANOLA SPRAY 450GM Gold N Canola", price: 4, gstFlag: false, gstAmount: 0 }
-                ],
-                drinks: [
-                    { name: "SYRUP CARAMEL 700ML Monin", price: 14.5, gstFlag: true, gstAmount: 1.45 },
-                    { name: "SYRUP PEACH TEA 700ML Monin", price: 14.95, gstFlag: true, gstAmount: 1.5 },
-                    { name: "SYRUP RASPBERRY 700ML Monin", price: 18.5, gstFlag: true, gstAmount: 1.85 },
-                    { name: "SYRUP STRAWBERRY 700ML Monin", price: 17, gstFlag: true, gstAmount: 1.7 },
-                    { name: "TOPPING CHOCOLATE 3LT Cottees", price: 12, gstFlag: false, gstAmount: 0 },
-                    { name: "Choc powder for frappe", price: 12.9, gstFlag: false, gstAmount: 0 },
-                    { name: "Passionfruit Pulp 1kg", price: 7.9, gstFlag: false, gstAmount: 0 },
-                    { name: "COULIS MIX BERRY FROZEN 500GM SQUEEZE BOTTLE Sunnyside", price: 11.45, gstFlag: false, gstAmount: 0 },
-                    { name: "Caramel fudge sauce monin 1.89l", price: 25.4, gstFlag: true, gstAmount: 2.54 },
-                    { name: "SORBET PASSIONFRUIT 5LT Bravo", price: 30, gstFlag: false, gstAmount: 0 },
-                    { name: "Sorbet Lemon 5lt Bravo", price: 28.9, gstFlag: false, gstAmount: 0 },
-                    { name: "SORBET MANGO 5LT Bravo", price: 31, gstFlag: true, gstAmount: 3.1 },
-                    { name: "TOPPING BANANA 3LT G/F EDLYN", price: 11.5, gstFlag: false, gstAmount: 0 },
-                    { name: "NU PURE WATER 600ML X 24", price: 11.5, gstFlag: false, gstAmount: 0 },
-                    { name: "S.PELLEGRINO 250ML X 24", price: 31, gstFlag: true, gstAmount: 4 },
-                    { name: "V 250ML (CAN) X 24", price: 36, gstFlag: true, gstAmount: 4 },
-                    { name: "COKE 330ML (GLASS) X 24", price: 36, gstFlag: true, gstAmount: 3.6 },
-                    { name: "JUICE PINEAPPLE 2LT Eastcoast", price: 6.3, gstFlag: false, gstAmount: 0 },
-                    { name: "Lemon Mint 2L", price: 6.3, gstFlag: false, gstAmount: 0 },
-                    { name: "V 250ML (CAN - BLUE) X 24", price: 36, gstFlag: true, gstAmount: 4 }
-                ],
-                cakes: [
-                    { name: "4 pieces Cheesecake", price: 21.70, gstFlag: true, gstAmount: 2.199 },
-                    { name: "CAKE BROWNIE SLAB 1.6KG Sara Lee", price: 24, gstFlag: true,
+    <footer class="app-footer">Calvin's HQ &copy; 2026 · Internal Use Only</footer>
+</div>
+
+<div class="order-bar" id="order-bar">
+    <div class="order-bar-info">
+        <div class="count" id="bar-count">0 items</div>
+        <div class="total" id="bar-total">$0.00</div>
+    </div>
+    <button class="order-bar-btn" id="bar-view-btn"><i class="fas fa-eye"></i> View Order</button>
+</div>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<script>
+(function(){
+'use strict';
+
+var VENUES=[
+{id:'glendenning',name:'CALVIN CREPES - GLENDENNING',code:'12019'},
+{id:'baulkham-hills',name:"CALVIN'S CREPES - BAULKHAM HILLS",code:'11824'},
+{id:'belmore',name:'CALVINS CREPES - BELMORE',code:'6216'},
+{id:'guildford',name:"CALVIN'S CREPES - GUILDFORD",code:'11964'},
+{id:'hq',name:"CALVIN'S CREPES - HQ",code:'11967'},
+{id:'liverpool',name:"CALVIN'S CREPES - LIVERPOOL",code:'11825'},
+{id:'peakhurst',name:"CALVIN'S CREPES - PEAKHURST",code:'11827'},
+{id:'smithfield',name:"CALVIN'S CREPES - SMITHFIELD",code:'11823'},
+{id:'st-marys',name:"CALVIN'S CREPES - ST MARY'S",code:'11826'}
+];
+
+var CATEGORIES=[
+{id:'chocolates',label:'Chocolates',icon:'fa-candy-cane'},
+{id:'fruit',label:'Fruits',icon:'fa-apple-alt'},
+{id:'sauces',label:'Sauces & Spreads',icon:'fa-wine-bottle'},
+{id:'crepes',label:'Crepe Items',icon:'fa-bread-slice'},
+{id:'drinks',label:'Drinks',icon:'fa-coffee'},
+{id:'cakes',label:'Cakes',icon:'fa-birthday-cake'},
+{id:'crumbs',label:'Toppings',icon:'fa-cookie-bite'},
+{id:'cleaning',label:'Cleaning',icon:'fa-pump-soap'},
+{id:'packaging',label:'Packaging',icon:'fa-box'},
+{id:'misc',label:'Misc',icon:'fa-ellipsis-h'},
+{id:'cash',label:'Cash & Change',icon:'fa-money-bill-wave'}
+];
+
+var STOCK={
+chocolates:[
+{name:'MILK CHOCOLATE VHP 10KG',price:280.00,gst:0},
+{name:'WHITE CALLET 28% 10KG BAG',price:330.00,gst:0},
+{name:'Box of Bueno',price:38.00,gst:0},
+{name:'KitKat Block',price:5.00,gst:0},
+{name:'Caramilk Block',price:7.00,gst:0},
+{name:'Mars Bar (box of 20)',price:12.50,gst:0},
+{name:'Ferrero (10 pieces)',price:18.00,gst:0},
+{name:'Snickers Bar (10 pieces)',price:12.50,gst:0}
+],
+fruit:[
+{name:'Strawberry',price:60.00,gst:0},
+{name:'Kiwi (5)',price:5.00,gst:0},
+{name:'Box of Banana',price:28.00,gst:0},
+{name:'Mint',price:2.00,gst:0},
+{name:'Blueberries',price:3.00,gst:0}
+],
+sauces:[
+{name:'Pistachio 5kg',price:105.00,gst:0},
+{name:'Hazelnut 5kg',price:54.50,gst:0},
+{name:'Nutella 3kg x2',price:73.00,gst:0},
+{name:'Maple Syrup Pure 1L (Queens)',price:34.00,gst:0},
+{name:'Maple Syrup Pure 4L',price:88.00,gst:0},
+{name:'Peanut Butter Smooth 1.8kg',price:14.00,gst:0},
+{name:'Biscoff (pack of 4)',price:92.00,gst:0},
+{name:'Bueno Sauce 5kg',price:48.50,gst:0}
+],
+crepes:[
+{name:'Ice Cream Vanilla 10L Everest',price:21.50,gst:0.10},
+{name:'Waffle Belgian (carton)',price:36.00,gst:0.10},
+{name:'Crepe Mix',price:20.00,gst:0.10},
+{name:'Pancake Mix',price:15.00,gst:0.10},
+{name:'Pancakes (5 pieces)',price:10.00,gst:0},
+{name:'Dixies Ice Cream Cups Vanilla 72x100ml',price:33.00,gst:0.10},
+{name:'Dessert Sauce Choc Fudge 500ml',price:10.61,gst:0},
+{name:'Dessert Sauce Belg Choc 1L',price:20.25,gst:0},
+{name:'Oil Canola Spray 450g',price:4.00,gst:0}
+],
+drinks:[
+{name:'Syrup Caramel 700ml Monin',price:14.50,gst:0.10},
+{name:'Syrup Peach Tea 700ml Monin',price:14.95,gst:0.10},
+{name:'Syrup Raspberry 700ml Monin',price:18.50,gst:0.10},
+{name:'Syrup Strawberry 700ml Monin',price:17.00,gst:0.10},
+{name:'Topping Chocolate 3L Cottees',price:12.00,gst:0},
+{name:'Choc Powder Frappe',price:12.90,gst:0},
+{name:'Passionfruit Pulp 1kg',price:7.90,gst:0},
+{name:'Coulis Berry 500g Sunnyside',price:11.45,gst:0},
+{name:'Caramel Fudge Sauce Monin 1.89L',price:25.40,gst:0.10},
+{name:'Sorbet Passionfruit 5L Bravo',price:30.00,gst:0},
+{name:'Sorbet Lemon 5L Bravo',price:28.90,gst:0},
+{name:'Sorbet Mango 5L Bravo',price:31.00,gst:0.10},
+{name:'Topping Banana 3L Edlyn',price:11.50,gst:0},
+{name:'Nu Pure Water 600ml x24',price:11.50,gst:0},
+{name:'S.Pellegrino 250ml x24',price:31.00,gst:0.10},
+{name:'V 250ml Can x24',price:36.00,gst:0.10},
+{name:'Coke 330ml Glass x24',price:36.00,gst:0.10},
+{name:'Juice Pineapple 2L Eastcoast',price:6.30,gst:0},
+{name:'Lemon Mint 2L',price:6.30,gst:0},
+{name:'V 250ml Blue Can x24',price:36.00,gst:0.10}
+],
+cakes:[
+{name:'Cheesecake (4 pieces)',price:21.70,gst:0.10},
+{name:'Brownie Slab 1.6kg Sara Lee',price:24.00,gst:0.10}
+],
+crumbs:[
+{name:'Peanuts Granulated 1kg Galaxy',price:6.40,gst:0.10},
+{name:'Pistachio Kernal 1kg',price:39.95,gst:0},
+{name:'Marshmallow Vanilla 1kg',price:8.50,gst:0.10},
+{name:'Hazelnut Meal 1kg',price:18.00,gst:0},
+{name:'Oreo Crushed 454g',price:4.50,gst:0.10},
+{name:'Choc Flake Garnish 5kg Cadbury',price:144.00,gst:0.10},
+{name:'Mini M&Ms 1kg Bulk',price:22.00,gst:0.10},
+{name:'Biscoff Crumbs',price:5.90,gst:0}
+],
+cleaning:[
+{name:'Wipes Green Roll H/D',price:87.00,gst:0.10},
+{name:'Dishwashing Liquid 5L Global',price:10.90,gst:0},
+{name:'Mop Head 450g Size 24',price:9.90,gst:0.10},
+{name:'Paper Towel Interleaf 4000s',price:45.00,gst:0.10},
+{name:'Alsco Tea Towel',price:0.80,gst:0.10},
+{name:'All Purpose Cleaner 5L',price:18.09,gst:0.10},
+{name:'Floor Cleaner 5L Global',price:13.00,gst:0.10},
+{name:'Gloves Vinyl Clear PF',price:3.50,gst:0},
+{name:'Sponge',price:2.50,gst:0}
+],
+packaging:[
+{name:'Dinner Brown Enviro Box (150)',price:27.00,gst:0.10},
+{name:'Brown Flat Handle Bag (200)',price:48.50,gst:0.10},
+{name:'100ml Sauce Containers',price:38.00,gst:0.10},
+{name:'EL4 Sauce Lids',price:28.00,gst:0.10},
+{name:'Large White Plastic Bag',price:33.00,gst:0.10},
+{name:'22oz Candy Stripe Cups (500)',price:92.00,gst:0.10},
+{name:'Paper Straws Black',price:78.00,gst:0.10},
+{name:'D98 Dome Lids (1000)',price:46.50,gst:0.10},
+{name:'Wooden Spoons (100)',price:60.00,gst:0.10},
+{name:'82L Garbage Bags (250)',price:34.00,gst:0.10},
+{name:'Bamboo Skewers 25cm (100)',price:1.10,gst:0.10},
+{name:'Disposable Forks',price:36.00,gst:0.10},
+{name:'Cling Wrap',price:18.90,gst:0.10},
+{name:'Cup Trays',price:8.00,gst:0.10},
+{name:'Acai Cup (100)',price:5.00,gst:0.10}
+],
+misc:[
+{name:'Granola Gourmet 1kg',price:16.00,gst:0},
+{name:'Mango Diced Frozen 1kg',price:10.50,gst:0},
+{name:'Gloves Black Nitrile Large',price:6.50,gst:0.10},
+{name:'Thermal Rolls 80x80 (box)',price:88.00,gst:0},
+{name:'Whipped Cream 500ml',price:7.90,gst:0},
+{name:'Icing Sugar',price:1.90,gst:0},
+{name:'Rice Bubbles',price:4.00,gst:0},
+{name:'Kataifi Prep',price:5.00,gst:0},
+{name:'Coconut Flakes',price:5.90,gst:0}
+],
+cash:[
+{name:'5 Cent',price:0.05,gst:0,cash:true},
+{name:'10 Cent',price:0.10,gst:0,cash:true},
+{name:'20 Cent',price:0.20,gst:0,cash:true},
+{name:'$5 Note',price:5.00,gst:0,cash:true},
+{name:'$10 Note',price:10.00,gst:0,cash:true},
+{name:'$20 Note',price:20.00,gst:0,cash:true}
+]
+};
+
+var orderItems=[],missingItems=[],activeCategory='chocolates';
+function $(id){return document.getElementById(id);}
+function fmt(n){return '$'+n.toFixed(2);}
+
+function saveState(){
+try{
+localStorage.setItem('calvins_order',JSON.stringify(orderItems));
+localStorage.setItem('calvins_missing',JSON.stringify(missingItems));
+localStorage.setItem('calvins_venue',$('location').value);
+localStorage.setItem('calvins_prepared',$('prepared-by').value);
+}catch(e){}
+}
+function loadState(){
+try{
+var o=localStorage.getItem('calvins_order');
+var m=localStorage.getItem('calvins_missing');
+var v=localStorage.getItem('calvins_venue');
+var p=localStorage.getItem('calvins_prepared');
+if(o)orderItems=JSON.parse(o);
+if(m)missingItems=JSON.parse(m);
+if(v)$('location').value=v;
+if(p)$('prepared-by').value=p;
+}catch(e){}
+}
+
+function init(){
+$('order-date').value=new Date().toISOString().split('T')[0];
+var locSel=$('location');
+VENUES.forEach(function(v){
+var opt=document.createElement('option');
+opt.value=v.id;opt.textContent=v.name+' ['+v.code+']';
+locSel.appendChild(opt);
+});
+var mc=$('missing-category');
+CATEGORIES.forEach(function(c){
+var opt=document.createElement('option');
+opt.value=c.id;opt.textContent=c.label;
+mc.appendChild(opt);
+});
+var tabs=$('tabs');
+CATEGORIES.forEach(function(c,i){
+var t=document.createElement('button');
+t.className='tab'+(i===0?' active':'');
+t.setAttribute('data-cat',c.id);
+t.innerHTML='<i class="fas '+c.icon+'"></i> '+c.label;
+t.addEventListener('click',function(){switchCategory(c.id);});
+tabs.appendChild(t);
+});
+var sections=$('sections');
+CATEGORIES.forEach(function(c,i){
+var sec=document.createElement('div');
+sec.className='section'+(i===0?' active':'');
+sec.id='section-'+c.id;
+sec.innerHTML='<div class="section-head"><h2><i class="fas '+c.icon+'"></i> '+c.label+'</h2><span class="item-count">'+STOCK[c.id].length+' items</span></div><div class="search-wrap"><i class="fas fa-search"></i><input type="text" placeholder="Search '+c.label.toLowerCase()+'…" data-search="'+c.id+'"></div><div class="items-grid" id="grid-'+c.id+'"></div>';
+sections.appendChild(sec);
+});
+CATEGORIES.forEach(function(c){renderGrid(c.id);});
+document.querySelectorAll('[data-search]').forEach(function(input){
+input.addEventListener('input',function(){renderGrid(this.getAttribute('data-search'),this.value);});
+});
+loadState();
+wireEvents();
+renderMissingList();
+updateBar();
+updateInvoice();
+}
+
+function renderGrid(catId,filter){
+var grid=$('grid-'+catId);
+if(!grid)return;
+var q=(filter||'').toLowerCase().trim();
+var items=STOCK[catId].filter(function(it){return !q||it.name.toLowerCase().indexOf(q)!==-1;});
+grid.innerHTML='';
+if(items.length===0){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-search"></i><p>No items match your search.</p></div>';return;}
+items.forEach(function(item){
+var card=document.createElement('div');
+card.className='item-card';
+var badge=item.cash?'<span class="badge badge-cash">Change</span>':(item.gst>0?'<span class="badge badge-gst">GST</span>':'');
+card.innerHTML='<div class="item-top"><div><div class="item-name">'+item.name+'</div>'+badge+'</div><div class="item-price">'+fmt(item.price)+'</div></div><div class="item-controls"><div class="qty-group"><button class="qty-btn" data-action="dec">−</button><input type="number" class="qty-input" value="0" min="0"><button class="qty-btn" data-action="inc">+</button></div><button class="btn-add" data-name="'+item.name.replace(/"/g,'&quot;')+'"><i class="fas fa-plus"></i> Add</button></div>';
+grid.appendChild(card);
+});
+grid.querySelectorAll('.qty-btn').forEach(function(btn){
+btn.addEventListener('click',function(){
+var input=this.parentNode.querySelector('.qty-input');
+var v=parseInt(input.value)||0;
+if(this.getAttribute('data-action')==='inc')v++;
+else if(v>0)v--;
+input.value=v;
+});
+});
+grid.querySelectorAll('.qty-input').forEach(function(inp){
+inp.addEventListener('change',function(){if((parseInt(this.value)||0)<0)this.value=0;});
+});
+grid.querySelectorAll('.btn-add').forEach(function(btn){
+btn.addEventListener('click',function(){
+var input=this.parentNode.querySelector('.qty-input');
+var qty=parseInt(input.value)||0;
+if(qty<=0){toast('Set a quantity first','warning');return;}
+var name=this.getAttribute('data-name');
+addToOrder(catId,name,qty);
+input.value=0;
+});
+});
+}
+
+function switchCategory(catId){
+activeCategory=catId;
+document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-cat')===catId);});
+document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+var sec=$('section-'+catId);
+if(sec)sec.classList.add('active');
+}
+
+function showSection(id){
+document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+var sec=$(id);
+if(sec)sec.classList.add('active');
+window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function findItem(catId,name){
+var arr=STOCK[catId]||[];
+for(var i=0;i<arr.length;i++)if(arr[i].name===name)return arr[i];
+return null;
+}
+
+function addToOrder(catId,name,qty){
+var item=findItem(catId,name);
+if(!item)return;
+var existing=null;
+for(var i=0;i<orderItems.length;i++){
+if(orderItems[i].cat===catId&&orderItems[i].name===name){existing=orderItems[i];break;}
+}
+if(existing)existing.qty+=qty;
+else orderItems.push({cat:catId,name:name,qty:qty,price:item.price,gst:item.gst||0,cash:!!item.cash});
+toast(qty+' × '+name+' added');
+updateBar();
+updateInvoice();
+saveState();
+}
+
+function computeTotals(){
+var sub=0,gst=0;
+orderItems.forEach(function(it){
+var lineTotal=it.price*it.qty;
+if(it.gst>0){
+var lineGst=lineTotal-(lineTotal/(1+it.gst));
+sub+=lineTotal-lineGst;
+gst+=lineGst;
+}else{
+sub+=lineTotal;
+}
+});
+return{sub:sub,gst:gst,total:sub+gst};
+}
+
+function updateBar(){
+var count=orderItems.reduce(function(a,b){return a+b.qty;},0);
+var t=computeTotals();
+$('bar-count').textContent=count+(count===1?' item':' items');
+$('bar-total').textContent=fmt(t.total);
+$('order-bar').classList.toggle('visible',count>0);
+}
+
+function updateInvoice(){
+var venue=getVenue();
+$('inv-venue-name').textContent=venue.name;
+$('inv-venue-meta').textContent='Venue Code: '+venue.code;
+$('inv-venue-full').textContent=venue.name;
+$('inv-venue-code').textContent='Code: '+venue.code;
+var d=$('order-date').value||new Date().toISOString().split('T')[0];
+var parts=d.split('-');
+var dObj=new Date(parts[0],parts[1]-1,parts[2]);
+$('inv-date').textContent='Date: '+dObj.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+$('inv-order-no').textContent='Order #: CR-'+venue.code+'-'+parts.join('');
+$('inv-prepared').textContent='Prepared by: '+($('prepared-by').value||'—');
+var tbody=$('invoice-items');
+tbody.innerHTML='';
+if(orderItems.length===0){
+tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#7A7A7A;padding:20px;">No items yet.</td></tr>';
+}else{
+orderItems.forEach(function(it){
+var lineTotal=it.price*it.qty;
+var lineGst=it.gst>0?lineTotal-(lineTotal/(1+it.gst)):0;
+var tr=document.createElement('tr');
+tr.innerHTML='<td>'+it.name+'</td><td>'+it.qty+'</td><td>'+fmt(it.price)+'</td><td>'+(it.gst>0?fmt(lineGst):'—')+'</td><td>'+fmt(lineTotal)+'</td>';
+tbody.appendChild(tr);
+});
+}
+var t=computeTotals();
+$('inv-subtotal').textContent=fmt(t.sub);
+$('inv-gst').textContent=fmt(t.gst);
+$('inv-total').textContent=fmt(t.total);
+}
+
+function renderMissingList(){
+var list=$('missing-list');
+list.innerHTML='';
+$('missing-count-badge').textContent=missingItems.length+(missingItems.length===1?' item':' items');
+if(missingItems.length===0){list.innerHTML='<div class="empty-state"><i class="fas fa-check-circle"></i><p>No missing items reported.</p></div>';return;}
+missingItems.forEach(function(it,idx){
+var div=document.createElement('div');
+div.className='missing-item';
+div.innerHTML='<div class="missing-item-info"><div class="missing-item-name">'+it.name+'</div><div class="missing-item-details">Qty: '+it.qty+' · '+fmt(it.price)+' each · Line: '+fmt(it.price*it.qty)+'</div></div><div class="missing-item-actions"><button class="icon-btn" data-miss-edit="'+idx+'"><i class="fas fa-pen"></i></button><button class="icon-btn danger" data-miss-del="'+idx+'"><i class="fas fa-trash"></i></button></div>';
+list.appendChild(div);
+});
+list.querySelectorAll('[data-miss-del]').forEach(function(b){
+b.addEventListener('click',function(){
+var i=parseInt(this.getAttribute('data-miss-del'));
+missingItems.splice(i,1);
+renderMissingList();
+saveState();
+});
+});
+list.querySelectorAll('[data-miss-edit]').forEach(function(b){
+b.addEventListener('click',function(){
+var i=parseInt(this.getAttribute('data-miss-edit'));
+var nv=prompt('New quantity for '+missingItems[i].name+':',missingItems[i].qty);
+var n=parseInt(nv);
+if(n>0){missingItems[i].qty=n;renderMissingList();saveState();}
+});
+});
+}
+
+function getVenue(){
+var id=$('location').value;
+for(var i=0;i<VENUES.length;i++)if(VENUES[i].id===id)return VENUES[i];
+return VENUES[0];
+}
+
+var toastTimer=null;
+function toast(msg,type){
+var t=$('toast');
+$('toast-msg').textContent=msg;
+t.className='toast show'+(type?' '+type:' success');
+clearTimeout(toastTimer);
+toastTimer=setTimeout(function(){t.classList.remove('show');},2200);
+}
+
+function sendWhatsAppInvoice(){
+if(orderItems.length===0){toast('No items in order','warning');return;}
+var v=getVenue();
+var t=computeTotals();
+var lines=[];
+lines.push("*Calvin's Crepes - Stock Order*");
+lines.push('');
+lines.push('Venue: '+v.name+' ['+v.code+']');
+lines.push('Date: '+$('order-date').value);
+lines.push('Prepared by: '+($('prepared-by').value||'—'));
+lines.push('');
+lines.push('*Items:*');
+orderItems.forEach(function(it){lines.push('• '+it.qty+' × '+it.name+' — '+fmt(it.price*it.qty));});
+lines.push('');
+lines.push('Subtotal: '+fmt(t.sub));
+lines.push('GST: '+fmt(t.gst));
+lines.push('*Total: '+fmt(t.total)+'*');
+var url='https://wa.me/?text='+encodeURIComponent(lines.join('\n'));
+window.open(url,'_blank');
+}
+
+function sendWhatsAppMissing(){
+if(missingItems.length===0){toast('No missing items','warning');return;}
+var v=getVenue();
+var lines=[];
+lines.push("*Calvin's Crepes - Missing Items*");
+lines.push('');
+lines.push('Venue: '+v.name+' ['+v.code+']');
+lines.push('Date: '+$('order-date').value);
+lines.push('Reported by: '+($('prepared-by').value||'—'));
+lines.push('');
+lines.push('*Missing:*');
+missingItems.forEach(function(it){lines.push('• '+it.qty+' × '+it.name);});
+var url='https://wa.me/?text='+encodeURIComponent(lines.join('\n'));
+window.open(url,'_blank');
+}
+
+function wireEvents(){
+$('location').addEventListener('change',function(){updateInvoice();saveState();});
+$('prepared-by').addEventListener('input',function(){updateInvoice();saveState();});
+$('order-date').addEventListener('change',updateInvoice);
+$('bar-view-btn').addEventListener('click',function(){
+if(orderItems.length===0)return;
+updateInvoice();
+showSection('summary-section');
+});
+$('back-btn').addEventListener('click',function(){showSection('section-'+activeCategory);});
+$('print-btn').addEventListener('click',function(){window.print();});
+$('whatsapp-btn').addEventListener('click',sendWhatsAppInvoice);
+$('new-order-btn').addEventListener('click',function(){
+if(!confirm('Clear the current order and start a new one?'))return;
+orderItems=[];
+updateBar();
+updateInvoice();
+saveState();
+showSection('section-'+activeCategory);
+toast('New order started');
+});
+$('missing-category').addEventListener('change',function(){
+var cat=this.value;
+var sel=$('missing-item');
+sel.innerHTML='<option value="">Select Item…</option>';
+if(!cat)return;
+STOCK[cat].forEach(function(it){
+var o=document.createElement('option');
+o.value=it.name;o.textContent=it.name;
+sel.appendChild(o);
+});
+});
+$('add-missing-btn').addEventListener('click',function(){
+var cat=$('missing-category').value;
+var name=$('missing-item').value;
+var qty=parseInt($('missing-qty').value)||0;
+if(!cat){toast('Select a category','warning');return;}
+if(!name){toast('Select an item','warning');return;}
+if(qty<=0){toast('Enter a quantity','warning');return;}
+var item=findItem(cat,name);
+var existing=null;
+for(var i=0;i<missingItems.length;i++)if(missingItems[i].name===name)existing=missingItems[i];
+if(existing)existing.qty+=qty;
+else missingItems.push({name:name,qty:qty,price:item.price});
+renderMissingList();
+saveState();
+$('missing-qty').value=1;
+toast('Added to missing list');
+});
+$('whatsapp-missing-btn').addEventListener('click',sendWhatsAppMissing);
+$('clear-missing-btn').addEventListener('click',function(){
+if(!confirm('Clear all missing items?'))return;
+missingItems=[];
+renderMissingList();
+saveState();
+toast('Missing list cleared');
+});
+var gmBtn=document.createElement('button');
+gmBtn.className='order-bar-btn';
+gmBtn.style.cssText='position:fixed;top:16px;right:16px;z-index:99;padding:10px 16px;font-size:.82rem;background:#E65100;';
+gmBtn.innerHTML='<i class="fas fa-exclamation-triangle"></i> Missing';
+gmBtn.addEventListener('click',function(){showSection('missing-section');});
+document.body.appendChild(gmBtn);
+document.addEventListener('keydown',function(e){
+if(e.key==='Escape'){showSection('section-'+activeCategory);}
+});
+}
+
+document.addEventListener('DOMContentLoaded',init);
+})();
+</script>
+</body>
+</html>
